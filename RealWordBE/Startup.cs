@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -8,12 +9,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using RealWord.DB;
 using RealWord.DB.Entities;
 using RealWordBE.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RealWordBE
@@ -36,6 +39,28 @@ namespace RealWordBE
             services.Configure<JWT>(Configuration.GetSection("JWT"));
             //User Manager Service
             services.AddIdentity<ApplicationUser ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddScoped<IUserService ,UserService>();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(o =>
+                {
+                    o.RequireHttpsMetadata = false;
+                    o.SaveToken = false;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true ,
+                        ValidateIssuer = true ,
+                        ValidateAudience = true ,
+                        ValidateLifetime = true ,
+                        ClockSkew = TimeSpan.Zero ,
+                        ValidIssuer = Configuration["JWT:Issuer"] ,
+                        ValidAudience = Configuration["JWT:Audience"] ,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
+                    };
+                });
             services.AddControllers();
 
         }
@@ -51,6 +76,7 @@ namespace RealWordBE
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
