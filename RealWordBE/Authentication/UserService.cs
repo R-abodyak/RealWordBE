@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -23,8 +25,12 @@ namespace RealWordBE.Authentication
             if( userWithSameEmail == null )
             {
                 var result = await _userManager.CreateAsync(user ,user.Password);
-                if( result.Succeeded ) { return $"User Registered with username {user.UserName}"; }
-                return "hello";
+                if( result.Succeeded )
+                {
+
+                    return "Success";
+                }
+                return result.Errors.Select(q => q.Description).First();
             }
             else
             {

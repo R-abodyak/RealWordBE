@@ -10,7 +10,7 @@ namespace RealWord.DB.Models
     {
         [JsonPropertyName("user")]
 
-        public ApplicationUser applicationUser { get; set; }
-        // public  UserForRegisterDto  userForRegisterDto { get; set; }
+        //public ApplicationUser applicationUser { get; set; }
+        public UserForRegisterDto userForRegisterDto { get; set; }
     }
 }
