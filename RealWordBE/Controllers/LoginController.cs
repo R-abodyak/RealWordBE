@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Entities;
+using RealWord.DB.Models;
 using RealWordBE.Authentication;
 using System.Threading.Tasks;
 
@@ -15,9 +16,10 @@ namespace RealWordBE.Controllers
             _userService = userService;
         }
         [HttpPost("users")]
-        public async Task<ActionResult> RegisterAsync(ApplicationUser model)
+        public async Task<ActionResult> RegisterAsync(RegisterOuterDto model)
         {
-            var result = await _userService.RegisterAsync(model);
+            var user = model.applicationUser;
+            var result = await _userService.RegisterAsync(user);
             return Ok(result);
         }
     }

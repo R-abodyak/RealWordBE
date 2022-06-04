@@ -23,8 +23,8 @@ namespace RealWordBE.Authentication
             if( userWithSameEmail == null )
             {
                 var result = await _userManager.CreateAsync(user ,user.Password);
-
-                return $"User Registered with username {user.UserName}";
+                if( result.Succeeded ) { return $"User Registered with username {user.UserName}"; }
+                return "hello";
             }
             else
             {
