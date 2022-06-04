@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace RealWord.DB.Models
 {
     public class UserForRegisterDto
     {
-        public string username { get; set; }
-        public string email { get; set; }
-        public string password { get; set; }
+        [JsonPropertyName("username")]
+        public string UserName { get; set; }
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+        [JsonPropertyName("password")]
+        public string Password { get; set; }
 
     }
 }
