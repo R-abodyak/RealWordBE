@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RealWord.DB
 {
-    public class ApplicationDbContext:IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext:IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

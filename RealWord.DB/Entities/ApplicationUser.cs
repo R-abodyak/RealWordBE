@@ -2,7 +2,7 @@
 
 namespace RealWord.DB.Entities
 {
-    public class ApplicationUser:IdentityUser
+    public class User:IdentityUser
     {
         public string Password { get; set; }
         public string Image { get; set; }

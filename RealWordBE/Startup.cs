@@ -39,7 +39,7 @@ namespace RealWordBE
                    Configuration.GetConnectionString("RealWorldDB")));
             services.Configure<JWT>(Configuration.GetSection("JWT"));
             //User Manager Service
-            services.AddIdentity<ApplicationUser ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<User ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddScoped<IUserService ,UserService>();
             services.Configure<IdentityOptions>(options =>
             {

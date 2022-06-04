@@ -11,14 +11,14 @@ namespace RealWordBE.Authentication
 {
     public class UserService:IUserService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly JWT _jwt;
-        public UserService(UserManager<ApplicationUser> userManager ,IOptions<JWT> jwt)
+        public UserService(UserManager<User> userManager ,IOptions<JWT> jwt)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
         }
-        public async Task<string> RegisterAsync(ApplicationUser user)
+        public async Task<string> RegisterAsync(User user)
         {
             var X = user;
             var userWithSameEmail = await _userManager.FindByEmailAsync(user.Email);

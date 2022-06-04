@@ -5,6 +5,6 @@ namespace RealWordBE.Authentication
 {
     public interface IUserService
     {
-        Task<string> RegisterAsync(ApplicationUser user);
+        Task<string> RegisterAsync(User user);
     }
 }
