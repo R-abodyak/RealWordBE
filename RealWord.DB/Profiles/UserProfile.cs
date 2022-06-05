@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
+using RealWord.DB.Models.Request_Dtos;
 using RealWord.DB.Models.Response_Dtos;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,8 @@ namespace RealWord.DB.Profiles
     {
         public UserProfile()
         {
-            CreateMap<UserForRegisterDto ,User>();
+            CreateMap<RegisterDto ,User>();
+            CreateMap<LoginDto ,User>();
             CreateMap<User ,UserResponseDto>();
         }
     }
