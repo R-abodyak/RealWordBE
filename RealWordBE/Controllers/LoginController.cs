@@ -45,13 +45,16 @@ namespace RealWordBE.Controllers
 
             if( userEntity == null )
             {
-                return Unauthorized();
-                //(errorMessage)
+                return Unauthorized(new Error
+                {
+                    Tittle = "Unauthorized" ,
+                    Status = "401" ,
+                    ErrorMessage = "Invalid email or Password"
+                });
             }
             else
             {
                 var token = await _userService.CreateJwtToken(userEntity);
-
                 var respone = _mapper.Map<UserResponseDto>(userEntity);
                 respone.Token = token;
                 return Ok(respone);
