@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RealWordBE.Authentication
@@ -17,6 +23,51 @@ namespace RealWordBE.Authentication
         {
             _userManager = userManager;
             _jwt = jwt.Value;
+        }
+
+        public async Task<User> AuthenticateUser(string email ,string password)
+        {
+            var userEntity = await _userManager.FindByEmailAsync(email);
+            if( userEntity == null ) return null;
+            PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
+            var x = ValidatePassword(userEntity ,password ,passwordHasher);
+            if( x )
+            {
+                return userEntity;
+            }
+            return null;
+        }
+
+        private bool ValidatePassword(User user ,string password ,IPasswordHasher<User> passwordHasher)
+        {
+
+            var x = passwordHasher.VerifyHashedPassword(user ,user.PasswordHash ,password) != PasswordVerificationResult.Failed;
+            return x;
+
+        }
+
+        public async Task<string> CreateJwtToken(User user)
+        {
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("uid", user.Id)
+            }
+            .Union(userClaims);
+
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+            var signingCredentials = new SigningCredentials(symmetricSecurityKey ,SecurityAlgorithms.HmacSha256);
+            var jwtSecurityToken = new JwtSecurityToken(
+                issuer: _jwt.Issuer ,
+                audience: _jwt.Audience ,
+                claims: claims ,
+                expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes) ,
+                signingCredentials: signingCredentials);
+            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+
         }
         public async Task<string> RegisterAsync(User user)
         {
