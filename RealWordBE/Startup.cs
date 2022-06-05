@@ -95,9 +95,8 @@ namespace RealWordBE
 
             app.UseRouting();
             app.UseAuthentication();
-
             app.UseAuthorization();
-
+            app.UseMiddleware<TokenManagerMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
