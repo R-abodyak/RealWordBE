@@ -1,11 +1,14 @@
 using AutoMapper;
+using DoctorWho2.Authintication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using RealWord.DB;
 using RealWord.DB.Entities;
 using RealWordBE.Authentication;
+using RealWordBE.Authentication.Logout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +75,10 @@ namespace RealWordBE
                     };
                 });
             services.AddAutoMapper();
+            services.AddTransient<ITokenManager ,TokenManager>();
+            services.AddSingleton<IHttpContextAccessor ,HttpContextAccessor>();
+            services.AddTransient<TokenManagerMiddleware>();
+            services.AddSingleton<IMemoryCache ,MemoryCache>();
             services.AddControllers();
 
         }
