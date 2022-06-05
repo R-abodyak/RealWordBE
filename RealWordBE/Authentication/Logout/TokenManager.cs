@@ -1,24 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace RealWordBE.Authentication.Logout
 {
     public class TokenManager:ITokenManager
     {
-        private MemoryCache _cache;
+        private IMemoryCache _cache;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TokenManager(MemoryCache cache ,
+        public TokenManager(IMemoryCache cache ,
                 IHttpContextAccessor httpContextAccessor
 
             )
@@ -52,8 +47,7 @@ namespace RealWordBE.Authentication.Logout
             };
             var token2 = GetKey(token);
             _cache.Set("key" ,token2 ,cacheExpiryOptions);
-            var x = _cache.Count;
-            x = 3;
+
 
         }
 
