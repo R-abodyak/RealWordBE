@@ -30,11 +30,16 @@ namespace RealWordBE.Controllers
             if( result == "Success" )
             {
                 var response = _mapper.Map<UserResponseDto>(user);
-                //TO DO  redirect to get  user is not that:(
+                //TO DO  redirect to get 
                 return Ok(response);
             }
             else
-                return Ok(result);
+                return BadRequest(new Error
+                {
+                    Tittle = "Bad Request" ,
+                    Status = "400" ,
+                    ErrorMessage = result
+                });
         }
         [HttpPost("users/login")]
         public async Task<IActionResult> LoginAsync(LoginOuterDto model)
