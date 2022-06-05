@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
 using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
 using RealWord.DB.Models.Response_Dtos;
 using RealWordBE.Authentication;
+using RealWordBE.Authentication.Logout;
 using System.Threading.Tasks;
 
 namespace RealWordBE.Controllers
@@ -15,11 +17,14 @@ namespace RealWordBE.Controllers
     {
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly ITokenManager _tokenManager;
 
-        public LoginController(IUserService userService ,IMapper mapper)
+
+        public LoginController(IUserService userService ,IMapper mapper ,ITokenManager tokenManager)
         {
             _userService = userService;
             _mapper = mapper;
+            _tokenManager = tokenManager;
         }
         [HttpPost("users")]
         public async Task<ActionResult> RegisterAsync(RegisterOuterDto model)
@@ -66,6 +71,16 @@ namespace RealWordBE.Controllers
             }
 
         }
+
+        [HttpPost("users/logout")]
+        [Authorize]
+        public IActionResult CancelAccessToken()
+        {
+            _tokenManager.DeactivateCurrentAsync();
+
+            return NoContent();
+        }
+
     }
 
 

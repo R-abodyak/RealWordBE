@@ -47,7 +47,7 @@ namespace RealWordBE.Authentication.Logout
             };
             var token2 = GetKey(token);
             _cache.Set("key" ,token2 ,cacheExpiryOptions);
-
+            //var x = _cache.Count;
 
         }
 
