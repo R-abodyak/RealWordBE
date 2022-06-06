@@ -84,7 +84,7 @@ namespace RealWordBE.Controllers
 
             return NoContent();
         }
-        [HttpGet]
+        [HttpGet("user")]
         [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
