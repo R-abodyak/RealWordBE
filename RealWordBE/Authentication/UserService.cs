@@ -53,7 +53,7 @@ namespace RealWordBE.Authentication
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("emailaddress", user.Email),
                 new Claim("uid", user.Id)
             }
             .Union(userClaims);
@@ -89,6 +89,10 @@ namespace RealWordBE.Authentication
             }
         }
 
-
+        async Task<User> IUserService.GetUserByEmailAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            return user;
+        }
     }
 }

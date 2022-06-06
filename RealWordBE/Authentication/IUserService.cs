@@ -7,8 +7,8 @@ namespace RealWordBE.Authentication
     {
         Task<string> RegisterAsync(User user);
         Task<User> AuthenticateUser(string email ,string password);
-        public Task<string> CreateJwtToken(User user);
+        Task<string> CreateJwtToken(User user);
 
-
+        Task<User> GetUserByEmailAsync(string email);
     }
 }
