@@ -1,16 +1,10 @@
 ﻿using AutoMapper;
+
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using RealWord.DB.Entities;
-using RealWord.DB.Models;
-using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
-using RealWord.DB.Models.Response_Dtos;
-using RealWordBE.Authentication;
-using RealWordBE.Authentication.Logout;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+
 using System.Threading.Tasks;
 
 namespace RealWordBE.Controllers
@@ -84,6 +78,7 @@ namespace RealWordBE.Controllers
 
             return NoContent();
         }
+
         [HttpGet("user")]
         [Authorize]
         public async Task<IActionResult> GetCurrentUser()
@@ -97,6 +92,7 @@ namespace RealWordBE.Controllers
             return Ok(userResponseDto);
 
         }
+
 
     }
 
