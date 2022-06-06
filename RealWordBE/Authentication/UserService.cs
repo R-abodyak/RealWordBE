@@ -94,5 +94,12 @@ namespace RealWordBE.Authentication
             var user = await _userManager.FindByEmailAsync(email);
             return user;
         }
+
+        async Task IUserService.UpdateUser(User currentUser)
+        {
+            //newUser.Id = currentUser.Id;
+            //currentUser.Email = newUser.Email;
+            var result = await _userManager.UpdateAsync(currentUser);
+        }
     }
 }
