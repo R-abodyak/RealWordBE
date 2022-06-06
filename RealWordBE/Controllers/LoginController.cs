@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
 using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
+using RealWord.DB.Models.RequestDtos;
+using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.Response_Dtos;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
@@ -95,6 +97,27 @@ namespace RealWordBE.Controllers
             if( token == null ) return Unauthorized();
             userResponseDto.Token = token;
             return Ok(userResponseDto);
+
+        }
+        [HttpPut("user")]
+        [Authorize]
+        public async Task<IActionResult> UpdateCurrentUser(UserForUpdateOuterDto userForUpdateOuter)
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
+            var currentUser = await _userService.GetUserByEmailAsync(email);
+            if( currentUser == null ) return Unauthorized();
+
+            var userDto = userForUpdateOuter.userForUpdateDto;
+            _mapper.Map<UserForUpdateDto ,User>(userDto ,currentUser);
+            await _userService.UpdateUser(currentUser);
+            //update user email or user name make  token claims become invalid ,token should be expired
+            _tokenManager.DeactivateCurrentAsync();
+
+            var userResponseDto = _mapper.Map<UserResponseDto>(currentUser);
+            userResponseDto.Token = null;
+            return Ok(userResponseDto);
+
+
 
         }
 
