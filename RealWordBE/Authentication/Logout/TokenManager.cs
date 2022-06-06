@@ -24,10 +24,10 @@ namespace RealWordBE.Authentication.Logout
         }
 
         public bool IsCurrentActiveToken()
-            => IsActiveAsync(GetCurrentAsync());
+            => IsActiveAsync(GetCurrentTokenAsync());
 
         public void DeactivateCurrentAsync()
-            => DeactivateAsync(GetCurrentAsync());
+            => DeactivateAsync(GetCurrentTokenAsync());
 
         public bool IsActiveAsync(string token)
         {
@@ -53,7 +53,7 @@ namespace RealWordBE.Authentication.Logout
 
 
 
-        private string GetCurrentAsync()
+        public string GetCurrentTokenAsync()
         {
             var authorizationHeader = _httpContextAccessor
                 .HttpContext.Request.Headers["authorization"];

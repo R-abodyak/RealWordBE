@@ -6,5 +6,6 @@
         void DeactivateCurrentAsync();
         bool IsActiveAsync(string token);
         bool IsCurrentActiveToken();
+        public string GetCurrentTokenAsync();
     }
 }

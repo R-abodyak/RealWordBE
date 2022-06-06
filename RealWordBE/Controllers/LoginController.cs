@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Entities;
@@ -7,6 +8,9 @@ using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
 using RealWord.DB.Models.Response_Dtos;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RealWordBE.Controllers
@@ -79,6 +83,19 @@ namespace RealWordBE.Controllers
             _tokenManager.DeactivateCurrentAsync();
 
             return NoContent();
+        }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
+            var user = await _userService.GetUserByEmailAsync(email);
+            var userResponseDto = _mapper.Map<UserResponseDto>(user);
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == null ) return Unauthorized();
+            userResponseDto.Token = token;
+            return Ok(userResponseDto);
+
         }
 
     }
