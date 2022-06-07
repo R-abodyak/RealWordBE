@@ -5,8 +5,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Migrations\20220607050545_DBSchema.cs" />
-	  <Compile Remove="Migrations\20220607050545_DBSchema.Designer.cs" />
+		<Compile Remove="Migrations\20220607050545_DBSchema.cs" />
+		<Compile Remove="Migrations\20220607050545_DBSchema.Designer.cs" />
+		<Compile Remove="Migrations\20220607063429_DBSchema.cs" />
+		<Compile Remove="Migrations\20220607063429_DBSchema.Designer.cs" />
+		<Compile Remove="Migrations\20220607071638_DBSchema.cs" />
+		<Compile Remove="Migrations\20220607071638_DBSchema.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

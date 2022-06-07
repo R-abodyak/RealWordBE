@@ -23,7 +23,8 @@ namespace RealWord.DB
             base.OnModelCreating(builder);
             builder.Entity<Folower>()
             .HasOne(f => f.User)
-            .WithMany(f => f.followers);
+            .WithMany(f => f.followers)
+            .HasForeignKey(f => f.UserId);
 
             builder.Entity<Folower>()
                 .HasOne(f => f.follower)
@@ -36,11 +37,24 @@ namespace RealWord.DB
             builder.Entity<ArticleTag>()
             .HasOne(f => f.Tag)
             .WithMany(f => f.ArticleTags);
+
             //composite primry key
             builder.Entity<ArticleTag>().HasKey(l => new { l.ArticleId ,l.TagId });
             builder.Entity<Folower>().HasKey(l => new { l.UserId ,l.followerId });
             builder.Entity<Comment>().HasKey(l => new { l.ArticleId ,l.User_id });
             builder.Entity<Like>().HasKey(l => new { l.ArticleId ,l.User_id });
+
+            //shadow property
+            builder.Entity<Article>()
+           .Property<DateTime>("CreatedDate");
+            builder.Entity<Article>()
+          .Property<DateTime>("UpdatedDate");
+            builder.Entity<Comment>()
+          .Property<DateTime>("CreatedDate");
+            builder.Entity<Comment>()
+          .Property<DateTime>("UpdatedDate");
+            builder.Entity<Like>()
+          .Property<DateTime>("CreatedDate");
 
         }
     }

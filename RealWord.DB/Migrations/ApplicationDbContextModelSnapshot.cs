@@ -157,7 +157,7 @@ namespace RealWord.DB.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -169,7 +169,7 @@ namespace RealWord.DB.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ArticlId");
@@ -203,10 +203,10 @@ namespace RealWord.DB.Migrations
                     b.Property<string>("CommentMsg")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -221,23 +221,15 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("RealWord.DB.Entities.Folower", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("followerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("followerId1")
+                    b.Property<string>("followerId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "followerId");
 
-                    b.HasIndex("UserId1");
-
-                    b.HasIndex("followerId1");
+                    b.HasIndex("followerId");
 
                     b.ToTable("Folower");
                 });
@@ -250,7 +242,7 @@ namespace RealWord.DB.Migrations
                     b.Property<int>("User_id")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -435,12 +427,15 @@ namespace RealWord.DB.Migrations
                 {
                     b.HasOne("RealWord.DB.Entities.User", "User")
                         .WithMany("followers")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("RealWord.DB.Entities.User", "follower")
                         .WithMany()
-                        .HasForeignKey("followerId1")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("followerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RealWord.DB.Entities.Like", b =>

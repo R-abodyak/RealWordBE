@@ -6,9 +6,9 @@ namespace RealWord.DB.Entities
 {
     public class Folower
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public User User { get; set; }
-        public int followerId { get; set; }
+        public string followerId { get; set; }
         public User follower { get; set; }
     }
 }

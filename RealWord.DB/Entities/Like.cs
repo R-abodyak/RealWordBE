@@ -8,7 +8,6 @@ namespace RealWord.DB.Entities
     {
         public int ArticleId { get; set; }
         public int User_id { get; set; }
-        public DateTime CreatedAt { get; set; }
         public Article Article { get; set; }
         public User User { get; set; }
 
