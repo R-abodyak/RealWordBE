@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RealWord.DB.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RealWord.DB
@@ -57,5 +58,27 @@ namespace RealWord.DB
           .Property<DateTime>("CreatedDate");
 
         }
+        public override int SaveChanges()
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e =>
+                        e.State == EntityState.Added
+                        || e.State == EntityState.Modified);
+
+            foreach( var entityEntry in entries )
+            {
+                entityEntry.Property("UpdatedDate").CurrentValue = DateTime.Now;
+
+                if( entityEntry.State == EntityState.Added )
+                {
+                    entityEntry.Property("CreatedDate").CurrentValue = DateTime.Now;
+                }
+            }
+
+            return base.SaveChanges();
+        }
     }
+
+
 }
