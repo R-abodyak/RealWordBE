@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace RealWord.DB.Entities
 {
@@ -7,6 +8,6 @@ namespace RealWord.DB.Entities
         public string Password { get; set; }
         public string Image { get; set; }
         public string Bio { get; set; }
-
+        public List<Folower> followers { get; set; }
     }
 }

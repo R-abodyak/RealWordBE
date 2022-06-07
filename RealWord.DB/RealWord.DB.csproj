@@ -5,6 +5,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Migrations\20220607050545_DBSchema.cs" />
+	  <Compile Remove="Migrations\20220607050545_DBSchema.Designer.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 
 
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.1.0" />

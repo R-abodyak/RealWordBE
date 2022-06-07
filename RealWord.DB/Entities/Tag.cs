@@ -8,5 +8,7 @@ namespace RealWord.DB.Entities
     {
         public int TagId { get; set; }
         public string Name { get; set; }
+        public ICollection<ArticleTag> ArticleTags { get; set; }
+
     }
 }
