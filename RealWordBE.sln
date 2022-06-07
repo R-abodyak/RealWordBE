@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealWordBE", "RealWordBE\Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealWord.DB", "RealWord.DB\RealWord.DB.csproj", "{6E975B83-A256-4158-9B2D-2FC47966DA54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealWorld.test", "RealWorld.test\RealWorld.test.csproj", "{409230F4-3284-4D1C-8AA7-CA07B1CF2EFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealWorld.test", "RealWorld.test\RealWorld.test.csproj", "{6A0D6020-B2E4-448A-9A8C-3571AE4906E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{6E975B83-A256-4158-9B2D-2FC47966DA54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E975B83-A256-4158-9B2D-2FC47966DA54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E975B83-A256-4158-9B2D-2FC47966DA54}.Release|Any CPU.Build.0 = Release|Any CPU
-		{409230F4-3284-4D1C-8AA7-CA07B1CF2EFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{409230F4-3284-4D1C-8AA7-CA07B1CF2EFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{409230F4-3284-4D1C-8AA7-CA07B1CF2EFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{409230F4-3284-4D1C-8AA7-CA07B1CF2EFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0D6020-B2E4-448A-9A8C-3571AE4906E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0D6020-B2E4-448A-9A8C-3571AE4906E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0D6020-B2E4-448A-9A8C-3571AE4906E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0D6020-B2E4-448A-9A8C-3571AE4906E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
