@@ -10,5 +10,6 @@ namespace RealWordBE.Authentication
         Task<string> CreateJwtToken(User user);
         Task<User> GetUserByEmailAsync(string email);
         Task UpdateUser(User User);
+        Task<User> GetUserByUsernameAsync(string userName);
     }
 }

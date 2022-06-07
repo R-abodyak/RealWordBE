@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RealWord.DB
 {
@@ -58,7 +60,7 @@ namespace RealWord.DB
           .Property<DateTime>("CreatedDate");
 
         }
-        public override int SaveChanges()
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var entries = ChangeTracker
                 .Entries()
@@ -76,7 +78,7 @@ namespace RealWord.DB
                 }
             }
 
-            return base.SaveChanges();
+            return base.SaveChangesAsync();
         }
     }
 

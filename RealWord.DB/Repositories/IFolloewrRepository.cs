@@ -4,7 +4,8 @@ using System.Text;
 
 namespace RealWord.DB.Repositories
 {
-    public class ProfileRepository:IProfileRepository
+    public interface IFolloewrRepository
     {
+
     }
 }
