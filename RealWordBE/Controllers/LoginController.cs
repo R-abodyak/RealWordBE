@@ -21,12 +21,12 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class LoginController:ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserRepository _userService;
         private readonly IMapper _mapper;
         private readonly ITokenManager _tokenManager;
 
 
-        public LoginController(IUserService userService ,IMapper mapper ,ITokenManager tokenManager)
+        public LoginController(IUserRepository userService ,IMapper mapper ,ITokenManager tokenManager)
         {
             _userService = userService;
             _mapper = mapper;

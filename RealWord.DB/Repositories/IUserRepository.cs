@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace RealWordBE.Authentication
 {
-    public interface IUserService
+    public interface IUserRepository
     {
         Task<string> RegisterAsync(User user);
         Task<User> AuthenticateUser(string email ,string password);

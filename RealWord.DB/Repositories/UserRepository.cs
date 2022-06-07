@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RealWord.DB.Entities;
@@ -15,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace RealWordBE.Authentication
 {
-    public class UserService:IUserService
+    public class UserRepository:IUserRepository
     {
         private readonly UserManager<User> _userManager;
         private readonly JWT _jwt;
-        public UserService(UserManager<User> userManager ,IOptions<JWT> jwt)
+        public UserRepository(UserManager<User> userManager ,IOptions<JWT> jwt)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
@@ -89,13 +88,18 @@ namespace RealWordBE.Authentication
             }
         }
 
-        async Task<User> IUserService.GetUserByEmailAsync(string email)
+        async Task<User> IUserRepository.GetUserByEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             return user;
         }
+        async Task<User> IUserRepository.GetUserByUsernameAsync(string userName)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            return user;
+        }
 
-        async Task IUserService.UpdateUser(User currentUser)
+        async Task IUserRepository.UpdateUser(User currentUser)
         {
             //newUser.Id = currentUser.Id;
             //currentUser.Email = newUser.Email;

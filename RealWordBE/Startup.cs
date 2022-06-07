@@ -44,7 +44,7 @@ namespace RealWordBE
             services.Configure<JWT>(Configuration.GetSection("JWT"));
             //User Manager Service
             services.AddIdentity<User ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddScoped<IUserService ,UserService>();
+            services.AddScoped<IUserRepository ,UserRepository>();
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;
