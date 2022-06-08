@@ -1,19 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RealWord.DB.Entities;
 using RealWord.DB.Models;
-using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
-using RealWord.DB.Models.RequestDtos;
-using RealWord.DB.Models.RequestDtos.OuterDtos;
-using RealWord.DB.Models.Response_Dtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
 using RealWordBE.Authentication;
-using RealWordBE.Authentication.Logout;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 namespace RealWordBE.Controllers
@@ -34,8 +25,8 @@ namespace RealWordBE.Controllers
             _mapper = mapper;
             _followerRepository = folloewrRepository;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetProfile(string username)
+        [HttpGet(Name = "Profile")]
+        public async Task<ActionResult<ProfileResponseDto>> GetProfile(string username)
         {
 
             var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
@@ -48,29 +39,79 @@ namespace RealWordBE.Controllers
                 });
             var profile = _mapper.Map<ProfileResponseDto>(dstUser);
             var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            profile.Following = _followerRepository.IsFollowing(SrcId ,dstUser.Id);
+
+            if( SrcId != null )
+                profile.Following = _followerRepository.IsFollowing(SrcId ,dstUser.Id);
 
             return Ok(profile);
         }
-        //[Authorize]
-        //[HttpPost("follow")]
-        //public async Task<IActionResult> FollowUser(string username)
-        //{
+        [Authorize]
+        [HttpPost("follow")]
+        public async Task<ActionResult<ProfileResponseDto>> FollowUser(string username)
+        {
 
-        //    var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
-        //    if( dstUser == null ) return BadRequest(
-        //        new Error()
-        //        {
-        //            Status = "404" ,
-        //            Tittle = "Bad Request" ,
-        //            ErrorMessage = "Invalid User Name "
-        //        });
-        //    var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
+            if( dstUser == null ) return BadRequest(
+                new Error()
+                {
+                    Status = "404" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = "Invalid User Name "
+                });
+            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if( _followerRepository.IsFollowing(SrcId ,dstUser.Id) )
+            {
+                return BadRequest(
+                new Error()
+                {
+                    Status = "404" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = $"User with user name {username} is aleady followed "
+                });
+            }
+            await _followerRepository.CreateFollow(SrcId ,dstUser.Id);
+            await _followerRepository.SaveChangesAsync();
+            var profile = new ProfileResponseDto();
+            profile.UserName = username;
+            //problem in sending bearer token
+            CreatedAtRoute("Profile" ,new { username = username } ,profile);
+            profile.Following = true;
+            return Ok(profile);
 
-        //    profile.Following = _followerRepository.IsFollowing(SrcId ,dstUser.Id);
+        }
+        [Authorize]
+        [HttpDelete("follow")]
+        public async Task<ActionResult<ProfileResponseDto>> UnFollowUser(string username)
+        {
 
-        //    return Ok(profile);
-        //}
+            var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
+            if( dstUser == null ) return BadRequest(
+                new Error()
+                {
+                    Status = "404" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = "Invalid User Name "
+                });
+            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
+            {
+                return BadRequest(
+                new Error()
+                {
+                    Status = "404" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = $"User with user name {username} is aleady Unfollowed "
+                });
+            }
+            _followerRepository.RemoveFollow(SrcId ,dstUser.Id);
+            await _followerRepository.SaveChangesAsync();
+            var profile = new ProfileResponseDto();
+            profile.UserName = username;
+            //problem in sending bearer token
+            CreatedAtRoute("Profile" ,new { username = username } ,profile);
+            return Ok(profile);
+
+        }
 
     }
 }

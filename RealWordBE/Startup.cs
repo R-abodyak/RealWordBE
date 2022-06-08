@@ -83,6 +83,10 @@ namespace RealWordBE
             services.AddSingleton<IHttpContextAccessor ,HttpContextAccessor>();
             services.AddTransient<TokenManagerMiddleware>();
             services.AddSingleton<IMemoryCache ,MemoryCache>();
+            services.AddMvc(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
             services.AddControllers();
 
         }

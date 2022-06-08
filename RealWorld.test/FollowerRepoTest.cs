@@ -44,7 +44,7 @@ namespace RealWorld.test
 
         }
         [Fact]
-        public void CreateFollowMethodTest()
+        public async Task CreateFollowMethodTest()
         {
 
 
@@ -54,7 +54,8 @@ namespace RealWorld.test
             context.Users.Add(u2);
 
             context.SaveChanges();
-            followerRepostory.CreateFollow(u1.Id ,u2.Id);
+            await followerRepostory.CreateFollow(u1.Id ,u2.Id);
+            context.SaveChanges();
 
             var result = followerRepostory.IsFollowing(u1.Id ,u2.Id);
             Assert.True(result);
