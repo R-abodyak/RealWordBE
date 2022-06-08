@@ -21,14 +21,14 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class LoginController:ControllerBase
     {
-        private readonly IUserRepository _userService;
+        private readonly IUserRepository _userReposotory;
         private readonly IMapper _mapper;
         private readonly ITokenManager _tokenManager;
 
 
-        public LoginController(IUserRepository userService ,IMapper mapper ,ITokenManager tokenManager)
+        public LoginController(IUserRepository userRepository ,IMapper mapper ,ITokenManager tokenManager)
         {
-            _userService = userService;
+            _userReposotory = userRepository;
             _mapper = mapper;
             _tokenManager = tokenManager;
         }
@@ -37,7 +37,7 @@ namespace RealWordBE.Controllers
         {
             var userDto = model.registerDto;
             var user = _mapper.Map<User>(userDto);
-            var result = await _userService.RegisterAsync(user);
+            var result = await _userReposotory.RegisterAsync(user);
             if( result == "Success" )
             {
                 var response = _mapper.Map<UserResponseDto>(user);
@@ -57,7 +57,7 @@ namespace RealWordBE.Controllers
         {
             var userDto = model.LoginDto;
 
-            var userEntity = await _userService.AuthenticateUser(userDto.Email ,userDto.Password);
+            var userEntity = await _userReposotory.AuthenticateUser(userDto.Email ,userDto.Password);
 
             if( userEntity == null )
             {
@@ -70,7 +70,7 @@ namespace RealWordBE.Controllers
             }
             else
             {
-                var token = await _userService.CreateJwtToken(userEntity);
+                var token = await _userReposotory.CreateJwtToken(userEntity);
                 var respone = _mapper.Map<UserResponseDto>(userEntity);
                 respone.Token = token;
                 return Ok(respone);
@@ -91,7 +91,7 @@ namespace RealWordBE.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
-            var user = await _userService.GetUserByEmailAsync(email);
+            var user = await _userReposotory.GetUserByEmailAsync(email);
             var userResponseDto = _mapper.Map<UserResponseDto>(user);
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == null ) return Unauthorized();
@@ -104,12 +104,12 @@ namespace RealWordBE.Controllers
         public async Task<IActionResult> UpdateCurrentUser(UserForUpdateOuterDto userForUpdateOuter)
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
-            var currentUser = await _userService.GetUserByEmailAsync(email);
+            var currentUser = await _userReposotory.GetUserByEmailAsync(email);
             if( currentUser == null ) return Unauthorized();
 
             var userDto = userForUpdateOuter.userForUpdateDto;
             _mapper.Map<UserForUpdateDto ,User>(userDto ,currentUser);
-            await _userService.UpdateUser(currentUser);
+            await _userReposotory.UpdateUser(currentUser);
             //update user email or user name make  token claims become invalid ,token should be expired
             _tokenManager.DeactivateCurrentAsync();
 

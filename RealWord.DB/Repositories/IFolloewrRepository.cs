@@ -4,8 +4,8 @@ using System.Text;
 
 namespace RealWord.DB.Repositories
 {
-    public interface IFolloewrRepository
+    public interface IFollowerRepository
     {
-
+        bool IsFollowing(string SrcId ,string DstId);
     }
 }

@@ -51,7 +51,7 @@ namespace RealWordBE.Authentication
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim("username", user.UserName),
                 new Claim("emailaddress", user.Email),
                 new Claim("uid", user.Id)
             }

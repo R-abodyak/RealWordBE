@@ -66,16 +66,23 @@ namespace RealWord.DB
                 .Entries()
                 .Where(e =>
                         e.State == EntityState.Added
-                        || e.State == EntityState.Modified);
+                        || e.State == EntityState.Modified
+
+                       );
 
             foreach( var entityEntry in entries )
             {
-                entityEntry.Property("UpdatedDate").CurrentValue = DateTime.Now;
-
+                if( entityEntry.Metadata.FindProperty("CreatedDate") == null )
+                    continue;
                 if( entityEntry.State == EntityState.Added )
                 {
                     entityEntry.Property("CreatedDate").CurrentValue = DateTime.Now;
                 }
+                if( entityEntry.Metadata.FindProperty("UpdatedDate") == null )
+                    continue;
+                entityEntry.Property("UpdatedDate").CurrentValue = DateTime.Now;
+
+
             }
 
             return base.SaveChangesAsync();

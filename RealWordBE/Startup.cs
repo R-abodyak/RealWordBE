@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using RealWord.DB;
 using RealWord.DB.Entities;
+using RealWord.DB.Repositories;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
 using System;
@@ -38,6 +39,7 @@ namespace RealWordBE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IFollowerRepository ,FollowerRepository>();
             services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(
                    Configuration.GetConnectionString("RealWorldDB")));
@@ -45,6 +47,8 @@ namespace RealWordBE
             //User Manager Service
             services.AddIdentity<User ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddScoped<IUserRepository ,UserRepository>();
+
+
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;

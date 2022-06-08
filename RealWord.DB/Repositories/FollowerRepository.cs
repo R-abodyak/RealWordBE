@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace RealWord.DB.Repositories
 {
-    public class FollowerRepository:BaseRepository, IFolloewrRepository
+    public class FollowerRepository:BaseRepository, IFollowerRepository
     {
         public FollowerRepository(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
         {
