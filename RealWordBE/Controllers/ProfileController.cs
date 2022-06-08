@@ -18,7 +18,8 @@ using System.Linq;
 using System.Threading.Tasks;
 namespace RealWordBE.Controllers
 {
-    [Route("api/profiles/")]
+    [Route("api/profiles/{username}")]
+
     [ApiController]
     public class ProfileController:ControllerBase
     {
@@ -33,7 +34,7 @@ namespace RealWordBE.Controllers
             _mapper = mapper;
             _followerRepository = folloewrRepository;
         }
-        [HttpGet("{username}")]
+        [HttpGet]
         public async Task<IActionResult> GetProfile(string username)
         {
 
@@ -43,7 +44,7 @@ namespace RealWordBE.Controllers
                 {
                     Status = "404" ,
                     Tittle = "Bad Request" ,
-                    ErrorMessage = "Invalid User name "
+                    ErrorMessage = "Invalid User Name "
                 });
             var profile = _mapper.Map<ProfileResponseDto>(dstUser);
             var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
@@ -51,6 +52,25 @@ namespace RealWordBE.Controllers
 
             return Ok(profile);
         }
+        //[Authorize]
+        //[HttpPost("follow")]
+        //public async Task<IActionResult> FollowUser(string username)
+        //{
+
+        //    var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
+        //    if( dstUser == null ) return BadRequest(
+        //        new Error()
+        //        {
+        //            Status = "404" ,
+        //            Tittle = "Bad Request" ,
+        //            ErrorMessage = "Invalid User Name "
+        //        });
+        //    var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+
+        //    profile.Following = _followerRepository.IsFollowing(SrcId ,dstUser.Id);
+
+        //    return Ok(profile);
+        //}
 
     }
 }
