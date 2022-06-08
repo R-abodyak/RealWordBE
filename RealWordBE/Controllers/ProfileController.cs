@@ -5,6 +5,7 @@ using RealWord.DB.Models;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
 using RealWordBE.Authentication;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 namespace RealWordBE.Controllers
@@ -93,17 +94,30 @@ namespace RealWordBE.Controllers
                     ErrorMessage = "Invalid User Name "
                 });
             var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
+            //if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
+            //{
+            //    return BadRequest(
+            //    new Error()
+            //    {
+            //        Status = "404" ,
+            //        Tittle = "Bad Request" ,
+            //        ErrorMessage = $"User with user name {username} is aleady Unfollowed "
+            //    });
+            //}
+            try { _followerRepository.RemoveFollow(SrcId ,dstUser.Id); }
+            catch( Exception e )
             {
-                return BadRequest(
-                new Error()
+                if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
                 {
-                    Status = "404" ,
-                    Tittle = "Bad Request" ,
-                    ErrorMessage = $"User with user name {username} is aleady Unfollowed "
-                });
+                    return BadRequest(
+                    new Error()
+                    {
+                        Status = "404" ,
+                        Tittle = "Bad Request" ,
+                        ErrorMessage = $"User with user name {username} is aleady Unfollowed "
+                    });
+                }
             }
-            _followerRepository.RemoveFollow(SrcId ,dstUser.Id);
             await _followerRepository.SaveChangesAsync();
             var profile = new ProfileResponseDto();
             profile.UserName = username;

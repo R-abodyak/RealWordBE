@@ -11,7 +11,6 @@ namespace RealWord.DB.Repositories
 {
     public class FollowerRepository:BaseRepository, IFollowerRepository
     {
-        Folower f1 = new Folower();
         public FollowerRepository(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
         {
         }
@@ -22,6 +21,7 @@ namespace RealWord.DB.Repositories
         }
         public async Task<Folower> CreateFollow(string SrcId ,string DstId)
         {
+            Folower f1 = new Folower();
             f1.UserId = SrcId; f1.followerId = DstId;
             var state = await _context.AddAsync(f1);
             return f1;
@@ -29,7 +29,7 @@ namespace RealWord.DB.Repositories
 
         public void RemoveFollow(string SrcId ,string DstId)
         {
-
+            Folower f1 = new Folower();
             f1.UserId = SrcId; f1.followerId = DstId;
             _context.Remove(f1);
             _context.SaveChanges();
