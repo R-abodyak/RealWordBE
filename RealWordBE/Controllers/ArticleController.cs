@@ -6,6 +6,7 @@ using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
+using RealWord.DB.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,9 +46,10 @@ namespace RealWordBE.Controllers
 
             await _articleTagService.CreateArticleWithTag(article ,tags);
 
+
             var FinalArticle = _articleRepository.GetArticleByTitle(article.Title);
-            _mapper.Map<ArticleResponseDto>(FinalArticle);
-            return Ok(FinalArticle);
+            var result = _mapper.Map<ArticleResponseDto>(FinalArticle);
+            return Ok(result);
 
         }
     }

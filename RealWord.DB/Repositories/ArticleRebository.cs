@@ -19,17 +19,6 @@ namespace RealWord.DB.Repositories
 
 
         }
-        public async Task AddTags(List<Tag> tagList)
-        {
-            foreach( var tag in tagList )
-            {
-                var tagDB = _context.Tags.Where(t => t.Name == tag.Name).FirstOrDefault();
-                if( tagDB == null )
-                    await _context.Tags.AddAsync(tag);
-            }
-
-        }
-
 
         public async Task AddTagsToArticle(Article article ,List<Tag> tagList)
         {
