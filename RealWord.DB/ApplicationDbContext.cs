@@ -34,6 +34,16 @@ namespace RealWord.DB
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Like>()
+           .HasOne(f => f.User)
+           .WithMany(f => f.Likes)
+           .HasForeignKey(f => f.User_id);
+
+            builder.Entity<Like>()
+           .HasOne(f => f.Article)
+           .WithMany(f => f.Likes)
+           .HasForeignKey(f => f.ArticleId);
+
             builder.Entity<ArticleTag>()
                 .HasOne(f => f.Article)
                 .WithMany(f => f.ArticleTags);
@@ -52,6 +62,8 @@ namespace RealWord.DB
             //composite primry key
             builder.Entity<ArticleTag>().HasKey(l => new { l.ArticleId ,l.TagId });
             builder.Entity<Folower>().HasKey(l => new { l.UserId ,l.followerId });
+
+
             builder.Entity<Comment>().HasKey(l => new { l.ArticleId ,l.User_id });
             builder.Entity<Like>().HasKey(l => new { l.ArticleId ,l.User_id });
 

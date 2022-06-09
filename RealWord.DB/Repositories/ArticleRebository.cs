@@ -20,9 +20,10 @@ namespace RealWord.DB.Repositories
 
         }
 
+
         public async Task AddTagsToArticle(Article article ,List<Tag> tagList)
         {
-            article = GetArticleByTitle(article.Title);
+            article = GetArticleBySlug(article.Slug);
             var JoinList = new List<ArticleTag>();
             foreach( var tag in tagList )
             {
@@ -33,11 +34,27 @@ namespace RealWord.DB.Repositories
             await _context.AddRangeAsync(JoinList);
         }
 
-        public Article GetArticleByTitle(string tittle)
+        public Article GetArticleBySlug(string slug)
         {
-            return _context.Articles.Where(a => a.Title == tittle).First();
+            var article = _context.Articles.Where(a => a.Slug == slug).First();
+
+            return article;
+
+        }
+        private string GetCreatedDate(Article article)
+        {
+            return _context.Entry(article).Property("CreatedDate").CurrentValue.ToString();
+        }
+        private string GetUpdatedDate(Article article)
+        {
+            return _context.Entry(article).Property("UpdatedDate").CurrentValue.ToString();
         }
 
+        private bool IsArticleFollowedByUser(int ArticleId ,string UserId)
+        {
+            _context.Articles.Find(ArticleId);
+            return true;
+        }
 
     }
 }

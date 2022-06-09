@@ -19,6 +19,8 @@
 		<Compile Remove="Migrations\20220609103143_Article_User_Relation.Designer.cs" />
 		<Compile Remove="Migrations\20220609103602_Article_User_Relation.cs" />
 		<Compile Remove="Migrations\20220609103602_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.cs" />
+		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

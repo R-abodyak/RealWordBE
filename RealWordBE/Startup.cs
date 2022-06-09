@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using RealWord.DB;
 using RealWord.DB.Entities;
 using RealWord.DB.Repositories;
+using RealWord.DB.Services;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
 using System;
@@ -39,6 +40,7 @@ namespace RealWordBE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ITagRepository ,TagRepository>();
             services.AddScoped<IFollowerRepository ,FollowerRepository>();
             services.AddScoped<IArticleRebository ,ArticleRebository>();
             services.AddScoped<ArticleTagService>();

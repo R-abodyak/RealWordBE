@@ -28,6 +28,16 @@ namespace RealWordBE.Controllers
             _articleTagService = articleTagService;
         }
 
+        [HttpGet("{slug}" ,Name = "GetArticle")]
+        public IActionResult GetArticle(string slug)
+        {
+            var article = _articleRepository.GetArticleBySlug(slug);
+            var articleResponseDto = _mapper.Map<ArticleResponseDto>(article);
+
+            return Ok(articleResponseDto);
+
+
+        }
 
         [Authorize]
         [HttpPost]
@@ -35,6 +45,7 @@ namespace RealWordBE.Controllers
         {
             var articleDto = articleOuterDto.ArticleDto;
             var article = _mapper.Map<Article>(articleDto);
+            article.Slug = article.Title.Replace(" " ,"_");
             List<Tag> tags = new List<Tag>();
             foreach( string tagName in articleDto.Tags )
             {
@@ -45,11 +56,11 @@ namespace RealWordBE.Controllers
             article.UserId = UserId;
 
             await _articleTagService.CreateArticleWithTag(article ,tags);
+            var articleResponseDto = _mapper.Map<ArticleResponseDto>(article);
 
+            CreatedAtRoute("GetArticle" ,new { slug = articleResponseDto.Slug } ,articleResponseDto);
+            return Ok(articleResponseDto);
 
-            var FinalArticle = _articleRepository.GetArticleByTitle(article.Title);
-            var result = _mapper.Map<ArticleResponseDto>(FinalArticle);
-            return Ok(result);
 
         }
     }

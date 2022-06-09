@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace RealWord.DB.Models.ResponseDtos
 {
@@ -13,7 +14,10 @@ namespace RealWord.DB.Models.ResponseDtos
         public string Body { get; set; }
 
         public List<string> TagList { get; set; }
-        public DateTime CreatedTime { get; set; }
-        public DateTime UpdatedTime { get; set; }
+        [JsonPropertyName("createdAt")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonPropertyName("updatedAt")]
+        public DateTime UpdatedDate { get; set; }
     }
 }
