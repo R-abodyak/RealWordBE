@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Entities;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.RequestDtos.OuterDtos;
+using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,15 @@ namespace RealWordBE.Controllers
     {
         private readonly IArticleRebository _articleRepository;
         private readonly IMapper _mapper;
-        public ArticleController(IArticleRebository articleRepository ,IMapper mapper)
+        public ArticleTagService _articleTagService { get; set; }
+
+        public ArticleController(IArticleRebository articleRepository ,IMapper mapper ,ArticleTagService articleTagService)
         {
             _articleRepository = articleRepository;
             _mapper = mapper;
+            _articleTagService = articleTagService;
         }
+
 
         [Authorize]
         [HttpPost]
@@ -35,11 +40,14 @@ namespace RealWordBE.Controllers
                 tags.Add(new Tag() { Name = tagName });
 
             }
-            var AuthorId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var UserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            article.UserId = UserId;
 
-            await _articleRepository.CreateArticle(article ,tags);
-            var result = _articleRepository.SaveChangesAsync();
-            return Ok();
+            await _articleTagService.CreateArticleWithTag(article ,tags);
+
+            var FinalArticle = _articleRepository.GetArticleByTitle(article.Title);
+            _mapper.Map<ArticleResponseDto>(FinalArticle);
+            return Ok(FinalArticle);
 
         }
     }

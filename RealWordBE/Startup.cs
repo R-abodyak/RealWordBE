@@ -41,6 +41,8 @@ namespace RealWordBE
         {
             services.AddScoped<IFollowerRepository ,FollowerRepository>();
             services.AddScoped<IArticleRebository ,ArticleRebository>();
+            services.AddScoped<ArticleTagService>();
+
 
             services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(

@@ -1,6 +1,7 @@
 ﻿using RealWord.DB.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,19 +13,40 @@ namespace RealWord.DB.Repositories
         {
         }
 
-        public async Task CreateArticle(Article article ,List<Tag> tagList)
+        public async Task AddArticle(Article article)
         {
             var result = await _context.Articles.AddAsync(article);
-            var JoinList = new List<ArticleTag>();
-            foreach( Tag tag in tagList )
+
+
+        }
+        public async Task AddTags(List<Tag> tagList)
+        {
+            foreach( var tag in tagList )
             {
-                var tagDB = await _context.Tags.FindAsync(tag.TagId);
-                if( tagDB == null ) _context.Tags.Add(tag);
-                JoinList.Add(new ArticleTag() { Article = article ,Tag = tag });
+                var tagDB = _context.Tags.Where(t => t.Name == tag.Name).FirstOrDefault();
+                if( tagDB == null )
+                    await _context.Tags.AddAsync(tag);
             }
-            // resul
+
+        }
 
 
+        public async Task AddTagsToArticle(Article article ,List<Tag> tagList)
+        {
+            article = GetArticleByTitle(article.Title);
+            var JoinList = new List<ArticleTag>();
+            foreach( var tag in tagList )
+            {
+                var tagg = _context.Tags.Where(t => t.Name == tag.Name).FirstOrDefault();
+                JoinList.Add(new ArticleTag() { Article = article ,Tag = tagg });
+            };
+            //}
+            await _context.AddRangeAsync(JoinList);
+        }
+
+        public Article GetArticleByTitle(string tittle)
+        {
+            return _context.Articles.Where(a => a.Title == tittle).First();
         }
 
 

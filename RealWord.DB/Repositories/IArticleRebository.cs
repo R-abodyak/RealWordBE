@@ -6,7 +6,10 @@ namespace RealWord.DB.Repositories
 {
     public interface IArticleRebository
     {
-        Task CreateArticle(Article article ,List<Tag> tagList);
+        Task AddArticle(Article article);
+        Task AddTags(List<Tag> tagList);
+        Task AddTagsToArticle(Article article ,List<Tag> tagList);
+        Article GetArticleByTitle(string title);
         Task SaveChangesAsync();
 
     }

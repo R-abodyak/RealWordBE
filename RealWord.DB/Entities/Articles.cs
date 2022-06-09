@@ -10,6 +10,8 @@ namespace RealWord.DB.Entities
     {
         [Key]
         public int ArticleId { get; set; }
+        [Required]
+
         public string Title { get; set; }
         public string Description { get; set; }
         public string Slug { get; set; }
