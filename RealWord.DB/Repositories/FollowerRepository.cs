@@ -17,7 +17,6 @@ namespace RealWord.DB.Repositories
         public bool IsFollowing(string SrcId ,string DstId)
         {
             return _context.Users.Where(u => u.Id == SrcId).Select(u => u.followers.Where(f => f.followerId == DstId)).FirstOrDefault().Count() != 0;
-            return true;
         }
         public async Task<Folower> CreateFollow(string SrcId ,string DstId)
         {

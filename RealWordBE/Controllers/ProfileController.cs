@@ -74,7 +74,6 @@ namespace RealWordBE.Controllers
             await _followerRepository.SaveChangesAsync();
             var profile = new ProfileResponseDto();
             profile.UserName = username;
-            //problem in sending bearer token
             CreatedAtRoute("Profile" ,new { username = username } ,profile);
             profile.Following = true;
             return Ok(profile);
@@ -97,7 +96,7 @@ namespace RealWordBE.Controllers
 
 
             try { _followerRepository.RemoveFollow(SrcId ,dstUser.Id); }
-            catch( Exception exception )
+            catch( Exception )
             {
                 if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
                 {
@@ -113,7 +112,6 @@ namespace RealWordBE.Controllers
             await _followerRepository.SaveChangesAsync();
             var profile = new ProfileResponseDto();
             profile.UserName = username;
-            //problem in sending bearer token
             CreatedAtRoute("Profile" ,new { username = username } ,profile);
             return Ok(profile);
 
