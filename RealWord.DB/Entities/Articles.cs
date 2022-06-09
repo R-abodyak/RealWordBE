@@ -12,6 +12,7 @@ namespace RealWord.DB.Entities
         public string Title { get; set; }
         public string Description { get; set; }
         public string Slug { get; set; }
+        public string body { get; set; }
         public ICollection<ArticleTag> ArticleTags { get; set; }
 
 

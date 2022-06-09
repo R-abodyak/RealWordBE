@@ -94,18 +94,10 @@ namespace RealWordBE.Controllers
                     ErrorMessage = "Invalid User Name "
                 });
             var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            //if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
-            //{
-            //    return BadRequest(
-            //    new Error()
-            //    {
-            //        Status = "404" ,
-            //        Tittle = "Bad Request" ,
-            //        ErrorMessage = $"User with user name {username} is aleady Unfollowed "
-            //    });
-            //}
+
+
             try { _followerRepository.RemoveFollow(SrcId ,dstUser.Id); }
-            catch( Exception e )
+            catch( Exception exception )
             {
                 if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
                 {

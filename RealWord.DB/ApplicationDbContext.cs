@@ -16,22 +16,9 @@ namespace RealWord.DB
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        // public DbSet<Folower> Follower { get; set; }
-
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-        }
-        public void DetachAllEntities()
-        {
-            var changedEntriesCopy = this.ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Added ||
-                            e.State == EntityState.Modified ||
-                            e.State == EntityState.Deleted)
-                .ToList();
-
-            foreach( var entry in changedEntriesCopy )
-                entry.State = EntityState.Detached;
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
