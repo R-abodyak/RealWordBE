@@ -11,6 +11,14 @@
 		<Compile Remove="Migrations\20220607063429_DBSchema.Designer.cs" />
 		<Compile Remove="Migrations\20220607071638_DBSchema.cs" />
 		<Compile Remove="Migrations\20220607071638_DBSchema.Designer.cs" />
+		<Compile Remove="Migrations\20220609101323_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609101323_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609101839_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609101839_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609103143_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609103143_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609103602_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609103602_Article_User_Relation.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -9,5 +9,7 @@ namespace RealWord.DB.Entities
         public string Image { get; set; }
         public string Bio { get; set; }
         public List<Folower> followers { get; set; }
+        public ICollection<Article> Articles { get; set; }
+
     }
 }

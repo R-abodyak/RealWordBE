@@ -40,6 +40,8 @@ namespace RealWordBE
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IFollowerRepository ,FollowerRepository>();
+            services.AddScoped<IArticleRebository ,ArticleRebository>();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(
                    Configuration.GetConnectionString("RealWorldDB")));

@@ -20,6 +20,8 @@ namespace RealWord.DB.Models.RequestDtos
         [Required]
         [JsonPropertyName("body")]
         public string Body { get; set; }
+        [JsonPropertyName("tagList")]
+
         public List<string> Tags { get; set; }
     }
 }

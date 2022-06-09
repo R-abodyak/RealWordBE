@@ -41,6 +41,10 @@ namespace RealWord.DB
             .HasOne(f => f.Tag)
             .WithMany(f => f.ArticleTags);
 
+            builder.Entity<Article>()
+                .HasOne(e => e.User)
+                .WithMany(e => e.Articles)
+                .HasForeignKey(a => a.UserId);
             //composite primry key
             builder.Entity<ArticleTag>().HasKey(l => new { l.ArticleId ,l.TagId });
             builder.Entity<Folower>().HasKey(l => new { l.UserId ,l.followerId });
