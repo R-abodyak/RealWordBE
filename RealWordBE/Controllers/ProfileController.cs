@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Models;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
+using RealWord.DB.Services;
 using RealWordBE.Authentication;
 using System;
 using System.Linq;
@@ -15,13 +16,14 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class ProfileController:ControllerBase
     {
-
+        private readonly ProfileService _profileService;
         private readonly IUserRepository _userReposotory;
         private readonly IMapper _mapper;
         private readonly IFollowerRepository _followerRepository;
 
-        public ProfileController(IUserRepository userRepository ,IFollowerRepository folloewrRepository ,IMapper mapper)
+        public ProfileController(ProfileService profileService ,IUserRepository userRepository ,IFollowerRepository folloewrRepository ,IMapper mapper)
         {
+            _profileService = profileService;
             _userReposotory = userRepository;
             _mapper = mapper;
             _followerRepository = folloewrRepository;
@@ -29,20 +31,18 @@ namespace RealWordBE.Controllers
         [HttpGet(Name = "Profile")]
         public async Task<ActionResult<ProfileResponseDto>> GetProfile(string username)
         {
-
-            var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
-            if( dstUser == null ) return BadRequest(
-                new Error()
-                {
-                    Status = "404" ,
-                    Tittle = "Bad Request" ,
-                    ErrorMessage = "Invalid User Name "
-                });
-            var profile = _mapper.Map<ProfileResponseDto>(dstUser);
             var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-
-            if( SrcId != null )
-                profile.Following = _followerRepository.IsFollowing(SrcId ,dstUser.Id);
+            var profile = await _profileService.GetProfileAsync(SrcId ,username);
+            if( profile == null )
+            {
+                return BadRequest(
+                      new Error()
+                      {
+                          Status = "404" ,
+                          Tittle = "Bad Request" ,
+                          ErrorMessage = "Invalid User Name "
+                      });
+            }
 
             return Ok(profile);
         }

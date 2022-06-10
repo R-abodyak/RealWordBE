@@ -41,7 +41,6 @@ namespace RealWordBE.Controllers
             if( result == "Success" )
             {
                 var response = _mapper.Map<UserResponseDto>(user);
-                //TO DO  redirect to get 
                 return Ok(response);
             }
             else

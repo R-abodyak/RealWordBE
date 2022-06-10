@@ -20,16 +20,18 @@ namespace RealWordBE.Controllers
 
         private readonly IMapper _mapper;
         private readonly ArticleService _articleService;
+        private readonly ProfileService _profileService;
 
-        public ArticleController(IMapper mapper ,ArticleService articleService)
+        public ArticleController(IMapper mapper ,ArticleService articleService ,ProfileService profileService)
         {
 
             _mapper = mapper;
             _articleService = articleService;
+            _profileService = profileService;
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
-        public ActionResult<ArticleResponseDto> GetArticle(string slug)
+        public async Task<ActionResult<ArticleResponseDto>> GetArticleAsync(string slug)
         {
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
@@ -37,12 +39,24 @@ namespace RealWordBE.Controllers
             if( articleResponseDto == null ) return BadRequest(new Error()
             { ErrorMessage = "Invalid Slug" ,Status = "400" ,Tittle = "BadRequest" });
             var profile = new ProfileResponseDto();
-            //author of article 
             profile.UserName = articleResponseDto.Author.UserName;
-            CreatedAtRoute("Profile" ,new { username = profile.UserName } ,profile);
+
+            //author of article 
+            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            profile = await _profileService.GetProfileAsync(SrcId ,profile.UserName);
+
+            if( profile == null )
+            {
+                return BadRequest(
+                      new Error()
+                      {
+                          Status = "404" ,
+                          Tittle = "Bad Request" ,
+                          ErrorMessage = "Invalid User Name "
+                      });
+            }
             articleResponseDto.Author = profile;
             return Ok(articleResponseDto);
-
 
         }
 
@@ -63,11 +77,10 @@ namespace RealWordBE.Controllers
             article.UserId = UserId;
 
             await _articleService.CreateArticleWithTag(article ,tags);
-            var articleResponseDto = new ArticleResponseDto();
-            articleResponseDto.Slug = article.Slug;
-            var articleResponseDto2 = GetArticle(article.Slug);
-            CreatedAtRoute("GetArticle" ,new { slug = articleResponseDto.Slug } ,articleResponseDto);
-            return GetArticle(article.Slug);
+
+            return RedirectToRoute("GetArticle" ,new { slug = article.Slug });
+
+
 
 
         }
@@ -78,12 +91,7 @@ namespace RealWordBE.Controllers
             var articlForUpdate = articleOuterDto.articleForUpdateDto;
 
             await _articleService.UpdateArticle(slug ,articlForUpdate);
-            var articleResponseDto = new ArticleResponseDto();
-            articleResponseDto.Slug = slug;
-            return CreatedAtRoute("GetArticle" ,new { slug = articleResponseDto.Slug } ,articleResponseDto);
-
-            // return Ok(articleResponseDto);
-
+            return RedirectToRoute("GetArticle" ,new { slug = slug });
 
         }
     }
