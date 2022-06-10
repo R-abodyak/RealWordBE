@@ -54,7 +54,11 @@ namespace RealWord.DB.Services
             List<string> tagsNames = new List<string>();
             foreach( var tag in Tags ) { tagsNames.Add(tag.Name); }
             articleResponseDto.TagList = tagsNames;
-            articleResponseDto.Author.UserName = _articleRepository.GetAuthorofArticle(slug).UserName;
+            articleResponseDto.Author = new ProfileResponseDto()
+            {
+                UserName = _articleRepository.GetAuthorofArticle(slug).UserName
+            };
+
             return articleResponseDto;
 
 

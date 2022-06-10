@@ -56,7 +56,8 @@ namespace RealWord.DB.Repositories
         {
             var article = GetArticleBySlug(slug);
             if( article == null ) return null;
-            return article.User;
+            var userId = article.UserId;
+            return _context.Users.Find(userId);
 
         }
 
