@@ -72,11 +72,12 @@ namespace RealWordBE.Controllers
             }
             await _followerRepository.CreateFollow(SrcId ,dstUser.Id);
             await _followerRepository.SaveChangesAsync();
+
             var profile = new ProfileResponseDto();
             profile.UserName = username;
-            CreatedAtRoute("Profile" ,new { username = username } ,profile);
-            profile.Following = true;
-            return Ok(profile);
+
+            return RedirectToRoute("Profile" ,new { username = username });
+
 
         }
         [Authorize]
@@ -110,10 +111,8 @@ namespace RealWordBE.Controllers
                 }
             }
             await _followerRepository.SaveChangesAsync();
-            var profile = new ProfileResponseDto();
-            profile.UserName = username;
-            CreatedAtRoute("Profile" ,new { username = username } ,profile);
-            return Ok(profile);
+
+            return RedirectToRoute("Profile" ,new { username = username });
 
         }
 
