@@ -22,5 +22,11 @@ namespace RealWord.DB.Repositories
             }
 
         }
+        public IEnumerable<Tag> GetTagsOfArticle(string slug)
+        {
+
+            var articleTags = _context.Articles.Where(a => a.Slug == slug).Select(a => a.ArticleTags.Select(a => a.Tag)).First();
+            return articleTags;
+        }
     }
 }

@@ -21,6 +21,8 @@
 		<Compile Remove="Migrations\20220609103602_Article_User_Relation.Designer.cs" />
 		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.cs" />
 		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609192222_Like_relation_and_comment_relation_Keys.cs" />
+		<Compile Remove="Migrations\20220609192222_Like_relation_and_comment_relation_Keys.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,6 +32,9 @@
 
 
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.1" />
+
+
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
 			<PrivateAssets>all</PrivateAssets>

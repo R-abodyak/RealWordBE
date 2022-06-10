@@ -10,7 +10,6 @@ using RealWord.DB.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace RealWordBE.Controllers
 {
     [Route("api/articles")]
@@ -19,21 +18,25 @@ namespace RealWordBE.Controllers
     {
         private readonly IArticleRebository _articleRepository;
         private readonly IMapper _mapper;
-        public ArticleTagService _articleTagService { get; set; }
+        public ArticleService _articleService { get; set; }
 
-        public ArticleController(IArticleRebository articleRepository ,IMapper mapper ,ArticleTagService articleTagService)
+        public ArticleController(IMapper mapper ,ArticleService articleService)
         {
-            _articleRepository = articleRepository;
+
             _mapper = mapper;
-            _articleTagService = articleTagService;
+            _articleService = articleService;
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
         public IActionResult GetArticle(string slug)
         {
-            var article = _articleRepository.GetArticleBySlug(slug);
-            var articleResponseDto = _mapper.Map<ArticleResponseDto>(article);
-
+            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var CurrentUsername = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var articleResponseDto = _articleService.GetAricleResponse(slug ,CurrentUserId);
+            var profile = new ProfileResponseDto();
+            profile.UserName = CurrentUsername;
+            CreatedAtRoute("Profile" ,new { username = CurrentUsername } ,profile);
+            articleResponseDto.Author = profile;
             return Ok(articleResponseDto);
 
 
@@ -55,7 +58,7 @@ namespace RealWordBE.Controllers
             var UserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             article.UserId = UserId;
 
-            await _articleTagService.CreateArticleWithTag(article ,tags);
+            await _articleService.CreateArticleWithTag(article ,tags);
             var articleResponseDto = _mapper.Map<ArticleResponseDto>(article);
 
             CreatedAtRoute("GetArticle" ,new { slug = articleResponseDto.Slug } ,articleResponseDto);

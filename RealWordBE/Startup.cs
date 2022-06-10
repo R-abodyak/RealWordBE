@@ -40,10 +40,11 @@ namespace RealWordBE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ILikeRepository ,LikeRepository>();
             services.AddScoped<ITagRepository ,TagRepository>();
             services.AddScoped<IFollowerRepository ,FollowerRepository>();
             services.AddScoped<IArticleRebository ,ArticleRebository>();
-            services.AddScoped<ArticleTagService>();
+            services.AddScoped<ArticleService>();
 
 
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -93,7 +94,7 @@ namespace RealWordBE
             {
                 options.SuppressAsyncSuffixInActionNames = false;
             });
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
 
         }
 

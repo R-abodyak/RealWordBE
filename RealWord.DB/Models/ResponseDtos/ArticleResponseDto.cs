@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace RealWord.DB.Models.ResponseDtos
 {
@@ -19,5 +20,8 @@ namespace RealWord.DB.Models.ResponseDtos
 
         [JsonPropertyName("updatedAt")]
         public DateTime UpdatedDate { get; set; }
+        public bool Favorited { get; set; }
+        public int FavoritesCount { get; set; }
+        public ProfileResponseDto Author { get; set; }
     }
 }

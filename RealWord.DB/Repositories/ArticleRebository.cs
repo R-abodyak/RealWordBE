@@ -21,9 +21,9 @@ namespace RealWord.DB.Repositories
         }
 
 
-        public async Task AddTagsToArticle(Article article ,List<Tag> tagList)
+        public async Task AddTagsToArticle(string slug ,List<Tag> tagList)
         {
-            article = GetArticleBySlug(article.Slug);
+            var article = GetArticleBySlug(slug);
             var JoinList = new List<ArticleTag>();
             foreach( var tag in tagList )
             {
@@ -41,20 +41,17 @@ namespace RealWord.DB.Repositories
             return article;
 
         }
-        private string GetCreatedDate(Article article)
+        public DateTime GetCreatedDate(String slug)
         {
-            return _context.Entry(article).Property("CreatedDate").CurrentValue.ToString();
+            var article = GetArticleBySlug(slug);
+            return (DateTime)_context.Entry(article).Property("CreatedDate").CurrentValue;
         }
-        private string GetUpdatedDate(Article article)
+        public DateTime GetUpdatedDate(String slug)
         {
-            return _context.Entry(article).Property("UpdatedDate").CurrentValue.ToString();
+            var article = GetArticleBySlug(slug);
+            return (DateTime)_context.Entry(article).Property("UpdatedDate").CurrentValue;
         }
 
-        private bool IsArticleFollowedByUser(int ArticleId ,string UserId)
-        {
-            _context.Articles.Find(ArticleId);
-            return true;
-        }
 
     }
 }

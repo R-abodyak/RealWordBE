@@ -9,6 +9,7 @@ namespace RealWord.DB.Repositories
     public interface ITagRepository
     {
         Task AddTags(List<Tag> tagList);
+        IEnumerable<Tag> GetTagsOfArticle(string slug);
 
 
     }
