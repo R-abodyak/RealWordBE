@@ -66,5 +66,20 @@ namespace RealWordBE.Controllers
 
 
         }
+        [Authorize]
+        [HttpPost("{slug}")]
+        public async Task<IActionResult> UpdateArticleAsync(ArticleForUpdateOuterDto articleOuterDto ,string slug)
+        {
+            var articlForUpdate = articleOuterDto.articleForUpdateDto;
+
+            await _articleService.UpdateArticle(slug ,articlForUpdate);
+            var articleResponseDto = new ArticleResponseDto();
+            articleResponseDto.Slug = slug;
+            CreatedAtRoute("GetArticle" ,new { slug = slug } ,articleResponseDto);
+
+            return Ok(articlForUpdate);
+
+
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RealWord.DB.Entities;
+using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
 using System;
@@ -30,12 +31,12 @@ namespace RealWord.DB.Services
             using var transaction =
                    await _context.Database.BeginTransactionAsync();
             await _articleRepository.AddArticle(article);
-            await _articleRepository.SaveChangesAsync();
+            await SaveChangesAsync();
             await _tagRepository.AddTags(tags);
-            await _articleRepository.SaveChangesAsync();
+            await SaveChangesAsync();
 
             await _articleRepository.AddTagsToArticle(article.Slug ,tags);
-            await _articleRepository.SaveChangesAsync();
+            await SaveChangesAsync();
             await transaction.CommitAsync();
 
         }
@@ -56,6 +57,16 @@ namespace RealWord.DB.Services
             return articleResponseDto;
 
 
+
+        }
+        public async Task UpdateArticle(string slug ,ArticleForUpdateDto UpdatedArticle)
+        {
+            var articleDB = _articleRepository.GetArticleBySlug(slug);
+            if( articleDB == null ) return;
+
+            _mapper.Map<ArticleForUpdateDto ,Article>(UpdatedArticle ,articleDB);
+            if( UpdatedArticle.Title != null ) articleDB.Slug.Replace(" " ,"_");
+            await SaveChangesAsync();
 
         }
 

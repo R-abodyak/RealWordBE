@@ -14,6 +14,8 @@ namespace RealWord.DB.Profiles
         {
             CreateMap<ArticleDto ,Article>();
             CreateMap<Article ,ArticleResponseDto>();
+            CreateMap<ArticleForUpdateDto ,Article>().ForAllMembers(x => x.Condition(
+                     (src ,dest ,sourceValue) => sourceValue != null));
 
         }
     }

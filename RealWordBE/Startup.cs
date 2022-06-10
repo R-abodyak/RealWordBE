@@ -94,7 +94,7 @@ namespace RealWordBE
             {
                 options.SuppressAsyncSuffixInActionNames = false;
             });
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers();
 
         }
 
