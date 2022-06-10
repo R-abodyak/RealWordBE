@@ -16,9 +16,9 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class ArticleController:ControllerBase
     {
-        private readonly IArticleRebository _articleRepository;
+
         private readonly IMapper _mapper;
-        public ArticleService _articleService { get; set; }
+        private readonly ArticleService _articleService;
 
         public ArticleController(IMapper mapper ,ArticleService articleService)
         {
