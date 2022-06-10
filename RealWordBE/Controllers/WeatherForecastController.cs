@@ -35,5 +35,10 @@ namespace RealWordBE.Controllers
             })
             .ToArray();
         }
+        [HttpPost]
+        public IEnumerable<WeatherForecast> post()
+        {
+            return Get();
+        }
     }
 }

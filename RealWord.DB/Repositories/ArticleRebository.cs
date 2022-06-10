@@ -36,8 +36,7 @@ namespace RealWord.DB.Repositories
 
         public Article GetArticleBySlug(string slug)
         {
-            var article = _context.Articles.Where(a => a.Slug == slug).First();
-
+            var article = _context.Articles.Where(a => a.Slug == slug).FirstOrDefault();
             return article;
 
         }

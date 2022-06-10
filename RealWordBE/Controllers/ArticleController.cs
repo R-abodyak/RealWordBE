@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Entities;
+using RealWord.DB.Models;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.ResponseDtos;
@@ -28,11 +29,13 @@ namespace RealWordBE.Controllers
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
-        public IActionResult GetArticle(string slug)
+        public ActionResult<ArticleResponseDto> GetArticle(string slug)
         {
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
             var articleResponseDto = _articleService.GetAricleResponse(slug ,CurrentUserId);
+            if( articleResponseDto == null ) return BadRequest(new Error()
+            { ErrorMessage = "Invalid Slug" ,Status = "400" ,Tittle = "BadRequest" });
             var profile = new ProfileResponseDto();
             //author of article 
             profile.UserName = articleResponseDto.Author.UserName;
@@ -45,7 +48,7 @@ namespace RealWordBE.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateArticle(ArticleOuterDto articleOuterDto)
+        public async Task<ActionResult<ArticleResponseDto>> CreateArticle(ArticleOuterDto articleOuterDto)
         {
             var articleDto = articleOuterDto.ArticleDto;
             var article = _mapper.Map<Article>(articleDto);
@@ -60,15 +63,16 @@ namespace RealWordBE.Controllers
             article.UserId = UserId;
 
             await _articleService.CreateArticleWithTag(article ,tags);
-            var articleResponseDto = _mapper.Map<ArticleResponseDto>(article);
-
+            var articleResponseDto = new ArticleResponseDto();
+            articleResponseDto.Slug = article.Slug;
+            var articleResponseDto2 = GetArticle(article.Slug);
             CreatedAtRoute("GetArticle" ,new { slug = articleResponseDto.Slug } ,articleResponseDto);
-            return Ok(articleResponseDto);
+            return GetArticle(article.Slug);
 
 
         }
         [Authorize]
-        [HttpPost("{slug}")]
+        [HttpPut("{slug}")]
         public async Task<IActionResult> UpdateArticleAsync(ArticleForUpdateOuterDto articleOuterDto ,string slug)
         {
             var articlForUpdate = articleOuterDto.articleForUpdateDto;
@@ -76,7 +80,7 @@ namespace RealWordBE.Controllers
             await _articleService.UpdateArticle(slug ,articlForUpdate);
             var articleResponseDto = new ArticleResponseDto();
             articleResponseDto.Slug = slug;
-            return CreatedAtRoute("GetArticle" ,new { slug = slug } ,articleResponseDto);
+            return CreatedAtRoute("GetArticle" ,new { slug = articleResponseDto.Slug } ,articleResponseDto);
 
             // return Ok(articleResponseDto);
 
