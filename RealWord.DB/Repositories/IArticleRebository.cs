@@ -12,6 +12,7 @@ namespace RealWord.DB.Repositories
         Article GetArticleBySlug(string slug);
         DateTime GetCreatedDate(string articleSlug);
         DateTime GetUpdatedDate(string articleSlug);
+        User GetAuthorofArticle(String slug);
 
 
         Task SaveChangesAsync();

@@ -51,8 +51,7 @@ namespace RealWord.DB
             .HasOne(f => f.Tag)
             .WithMany(f => f.ArticleTags);
 
-            builder.Entity<Article>()
-                .HasAlternateKey(e => e.Title);
+
 
             builder.Entity<Article>()
                .HasOne(e => e.User)

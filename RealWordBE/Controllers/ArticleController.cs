@@ -31,11 +31,12 @@ namespace RealWordBE.Controllers
         public IActionResult GetArticle(string slug)
         {
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var CurrentUsername = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+
             var articleResponseDto = _articleService.GetAricleResponse(slug ,CurrentUserId);
             var profile = new ProfileResponseDto();
-            profile.UserName = CurrentUsername;
-            CreatedAtRoute("Profile" ,new { username = CurrentUsername } ,profile);
+            //author of article 
+            profile.UserName = articleResponseDto.Author.UserName;
+            CreatedAtRoute("Profile" ,new { username = profile.UserName } ,profile);
             articleResponseDto.Author = profile;
             return Ok(articleResponseDto);
 
@@ -75,9 +76,9 @@ namespace RealWordBE.Controllers
             await _articleService.UpdateArticle(slug ,articlForUpdate);
             var articleResponseDto = new ArticleResponseDto();
             articleResponseDto.Slug = slug;
-            CreatedAtRoute("GetArticle" ,new { slug = slug } ,articleResponseDto);
+            return CreatedAtRoute("GetArticle" ,new { slug = slug } ,articleResponseDto);
 
-            return Ok(articlForUpdate);
+            // return Ok(articleResponseDto);
 
 
         }

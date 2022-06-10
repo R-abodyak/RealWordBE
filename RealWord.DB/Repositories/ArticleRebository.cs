@@ -52,6 +52,13 @@ namespace RealWord.DB.Repositories
             return (DateTime)_context.Entry(article).Property("UpdatedDate").CurrentValue;
         }
 
+        public User GetAuthorofArticle(String slug)
+        {
+            var article = GetArticleBySlug(slug);
+            if( article == null ) return null;
+            return article.User;
+
+        }
 
     }
 }
