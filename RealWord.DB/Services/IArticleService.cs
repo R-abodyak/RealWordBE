@@ -13,7 +13,8 @@ namespace RealWord.DB.Services
         Task CreateArticleWithTag(Article article ,List<Tag> tags);
         ArticleResponseDto GetAricleResponse(string slug ,String userId);
         Task UpdateArticle(string slug ,ArticleForUpdateDto UpdatedArticle);
-        bool HasPermissionToUpdate(String slug ,string currentUserId);
+        Task DeleteArticle(string slug);
+        bool IsArticleAuthor(String slug ,string currentUserId);
         bool IsValidSlug(string slug);
     }
 }

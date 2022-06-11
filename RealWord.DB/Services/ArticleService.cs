@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RealWord.DB.Services
 {
-    public class ArticleService:BaseRepository
+    public class ArticleService:BaseRepository, IArticleService
     {
         private readonly ILikeRepository _likeRepository;
         private readonly IMapper _mapper;
@@ -74,8 +74,15 @@ namespace RealWord.DB.Services
             await SaveChangesAsync();
 
         }
+        public async Task DeleteArticle(string slug)
+        {
+            var articleDB = _articleRepository.GetArticleBySlug(slug);
+            if( articleDB == null ) return;
+            _articleRepository.DeleteArticle(articleDB);
+            await SaveChangesAsync();
 
-        public bool HasPermissionToUpdate(String slug ,string currentUserId)
+        }
+        public bool IsArticleAuthor(String slug ,string currentUserId)
         {
             User Author = _articleRepository.GetAuthorofArticle(slug);
             if( Author == null ) return false;

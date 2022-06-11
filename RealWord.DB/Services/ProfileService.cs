@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RealWord.DB.Entities;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
 using RealWordBE.Authentication;
@@ -27,15 +28,17 @@ namespace RealWord.DB.Services
 
         public async Task<ProfileResponseDto> GetProfileAsync(string SrcUserName ,string DestinationUsername)
         {
-            var SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
-            if( SrcUser == null ) return null;
+            User SrcUser = null;
+
+            if( SrcUserName != null ) SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
+
             var dstUser = await _userReposotory.GetUserByUsernameAsync(DestinationUsername);
             if( dstUser == null ) return null;
 
             var profile = _mapper.Map<ProfileResponseDto>(dstUser);
 
 
-            if( SrcUserName != null )
+            if( SrcUser != null )
                 profile.Following = _followerRepository.IsFollowing(SrcUser.Id ,dstUser.Id);
 
             return profile;

@@ -59,6 +59,11 @@ namespace RealWord.DB.Repositories
             return _context.Users.Find(userId);
 
         }
+        public void DeleteArticle(Article article)
+        {
+
+            _context.Articles.Remove(article);
+        }
 
     }
 }
