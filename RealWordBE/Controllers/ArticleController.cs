@@ -50,7 +50,7 @@ namespace RealWordBE.Controllers
                 return BadRequest(
                       new Error()
                       {
-                          Status = "404" ,
+                          Status = "400" ,
                           Tittle = "Bad Request" ,
                           ErrorMessage = "Invalid User Name "
                       });
@@ -88,9 +88,21 @@ namespace RealWordBE.Controllers
         [HttpPut("{slug}")]
         public async Task<IActionResult> UpdateArticleAsync(ArticleForUpdateOuterDto articleOuterDto ,string slug)
         {
+            bool validSlug = _articleService.IsValidSlug(slug);
+            if( !validSlug ) return BadRequest(new Error()
+            {
+                Status = "400" ,
+                Tittle = "Bad Request" ,
+                ErrorMessage = "Invalid Slug "
+            });
             var articlForUpdate = articleOuterDto.articleForUpdateDto;
+            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
+            var permission = _articleService.HasPermissionToUpdate(slug ,SrcId);
+            if( permission == false ) return StatusCode(403 ,"Permission Denied for updating Articles belong to other Authors");
             await _articleService.UpdateArticle(slug ,articlForUpdate);
+            if( articlForUpdate.Title != null ) slug = articlForUpdate.Title.Replace(" " ,"_");
+
             return RedirectToRoute("GetArticle" ,new { slug = slug });
 
         }

@@ -70,10 +70,26 @@ namespace RealWord.DB.Services
             if( articleDB == null ) return;
 
             _mapper.Map<ArticleForUpdateDto ,Article>(UpdatedArticle ,articleDB);
-            if( UpdatedArticle.Title != null ) articleDB.Slug.Replace(" " ,"_");
+            if( UpdatedArticle.Title != null ) articleDB.Slug = articleDB.Title.Replace(" " ,"_");
             await SaveChangesAsync();
 
         }
+
+        public bool HasPermissionToUpdate(String slug ,string currentUserId)
+        {
+            User Author = _articleRepository.GetAuthorofArticle(slug);
+            if( Author == null ) return false;
+            return Author.Id == currentUserId ? true : false;
+        }
+        public bool IsValidSlug(string slug)
+        {
+
+            var articleDB = _articleRepository.GetArticleBySlug(slug);
+            if( articleDB == null ) return false;
+            return true;
+
+        }
+
 
     }
 }
