@@ -18,7 +18,6 @@ namespace RealWordBE.Controllers
     {
         private readonly IProfileService _profileService;
         private readonly IMapper _mapper;
-        private readonly IFollowerRepository _followerRepository;
 
         public ProfileController(IProfileService profileService ,IMapper mapper)
         {
@@ -50,7 +49,7 @@ namespace RealWordBE.Controllers
             var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
             var status = await _profileService.FollowUser(SrcUserName ,username);
-            if( status == FollowResult.Invalid )
+            if( status == Status.Invalid )
                 return BadRequest(
                 new Error()
                 {
@@ -60,7 +59,7 @@ namespace RealWordBE.Controllers
                 });
 
 
-            if( status == FollowResult.Duplicate )
+            if( status == Status.Duplicate )
             {
                 return BadRequest(
                 new Error()
@@ -87,7 +86,7 @@ namespace RealWordBE.Controllers
             var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
             var status = await _profileService.UnFollowUser(SrcUserName ,username);
-            if( status == FollowResult.Invalid )
+            if( status == Status.Invalid )
                 return BadRequest(
                 new Error()
                 {
@@ -97,7 +96,7 @@ namespace RealWordBE.Controllers
                 });
 
 
-            if( status == FollowResult.Duplicate )
+            if( status == Status.Duplicate )
             {
                 return BadRequest(
                 new Error()

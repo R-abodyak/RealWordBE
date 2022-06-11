@@ -23,6 +23,10 @@
 		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.Designer.cs" />
 		<Compile Remove="Migrations\20220609192222_Like_relation_and_comment_relation_Keys.cs" />
 		<Compile Remove="Migrations\20220609192222_Like_relation_and_comment_relation_Keys.Designer.cs" />
+		<Compile Remove="Migrations\20220611193245_identity_likeAndCommentTables.cs" />
+		<Compile Remove="Migrations\20220611193245_identity_likeAndCommentTables.Designer.cs" />
+		<Compile Remove="Migrations\20220611194347_drop_table_comment.cs" />
+		<Compile Remove="Migrations\20220611194347_drop_table_comment.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

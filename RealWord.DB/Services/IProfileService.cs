@@ -9,7 +9,7 @@ namespace RealWord.DB.Services
     public interface IProfileService
     {
         Task<ProfileResponseDto> GetProfileAsync(string SrcUserName ,string DestinationUsername);
-        Task<FollowResult> FollowUser(string SrcUserName ,string DestinationUserName);
-        Task<FollowResult> UnFollowUser(string SrcUserName ,string DestinationUserName);
+        Task<Status> FollowUser(string SrcUserName ,string DestinationUserName);
+        Task<Status> UnFollowUser(string SrcUserName ,string DestinationUserName);
     }
 }

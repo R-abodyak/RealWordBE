@@ -7,7 +7,7 @@ namespace RealWord.DB.Entities
 {
     public class Comment
     {
-
+        [Key]
         public int CommentId { get; set; }
 
         public int ArticleId { get; set; }
