@@ -23,7 +23,7 @@ namespace RealWord.DB.Repositories
         {
             var article = _context.Articles.Where(a => a.Slug == slug).FirstOrDefault();
             if( article == null ) return null;
-            var comments = article.Comments.ToList();
+            var comments = _context.Comments.Select(c => c).Where(a => a.Article == article).ToList();
             return comments;
         }
         public async Task<Comment> GetComment(int id)

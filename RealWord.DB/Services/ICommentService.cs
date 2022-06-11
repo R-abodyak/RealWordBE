@@ -12,5 +12,6 @@ namespace RealWord.DB.Services
     {
         Task<int> CreateComment(string currentUserId ,string slug ,CommentDto commentDto);
         Task<CommentResponseDto> GetCommentResponse(int commentId ,string slug ,string CurrentUserName);
+        Task<IEnumerable<CommentResponseDto>> GetComments(string slug ,string CurrentUserName);
     }
 }

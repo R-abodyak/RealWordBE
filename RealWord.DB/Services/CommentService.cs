@@ -52,6 +52,26 @@ namespace RealWord.DB.Services
         {
             var comment = await _commentRebository.GetComment(id);
             await SaveChangesAsync();
+            return await GenerateCommentRespnseDto(id ,slug ,CurrentUserName ,comment);
+        }
+
+
+
+        public async Task<IEnumerable<CommentResponseDto>> GetComments(string slug ,string CurrentUserName)
+        {
+            var comments = _commentRebository.GetComments(slug);
+            IList<CommentResponseDto> responses = new List<CommentResponseDto>();
+            foreach( var comment in comments )
+            {
+                var response = await GenerateCommentRespnseDto(comment.CommentId ,slug ,CurrentUserName ,comment);
+                responses.Add(response);
+            }
+            return responses;
+
+
+        }
+        private async Task<CommentResponseDto> GenerateCommentRespnseDto(int id ,string slug ,string CurrentUserName ,Comment comment)
+        {
             var commentResponse = _mapper.Map<CommentResponseDto>(comment);
             commentResponse.UpdatedDate = await _commentRebository.GetUpdatedDateAsync(id);
             commentResponse.CreatedDate = await _commentRebository.GetCreatedDate(id);

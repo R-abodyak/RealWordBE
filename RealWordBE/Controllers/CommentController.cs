@@ -47,5 +47,13 @@ namespace RealWordBE.Controllers
             return Ok(commentResponse);
 
         }
+        [HttpGet]
+        public async Task<ActionResult<CommentResponseDto>> GetComments(string slug)
+        {
+            var currentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+
+            var result = await _commentService.GetComments(slug ,currentUserName);
+            return Ok(result);
+        }
     }
 }
