@@ -21,18 +21,6 @@ namespace RealWord.DB.Repositories
         }
 
 
-        public async Task AddTagsToArticle(string slug ,List<Tag> tagList)
-        {
-            var article = GetArticleBySlug(slug);
-            var JoinList = new List<ArticleTag>();
-            foreach( var tag in tagList )
-            {
-                var tagg = _context.Tags.Where(t => t.Name == tag.Name).FirstOrDefault();
-                JoinList.Add(new ArticleTag() { Article = article ,Tag = tagg });
-            };
-            //}
-            await _context.AddRangeAsync(JoinList);
-        }
 
         public Article GetArticleBySlug(string slug)
         {

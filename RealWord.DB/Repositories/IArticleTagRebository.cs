@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace RealWord.DB.Repositories
 {
-    public interface ITagRepository
+    public interface IArticleTagRebository
     {
-        Task AddTags(List<Tag> tagList);
+        Task AddTagsToArticle(string slug ,List<Tag> tagList);
+        IEnumerable<Tag> GetTagsOfArticle(string slug);
 
 
     }

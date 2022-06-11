@@ -14,13 +14,16 @@ namespace RealWord.DB.Services
     {
         private readonly ILikeRepository _likeRepository;
         private readonly IMapper _mapper;
-        private IArticleRebository _articleRepository { get; set; }
-        private ITagRepository _tagRepository { get; set; }
-        public ArticleService(ApplicationDbContext applicationDbContext ,IArticleRebository articleRebository ,ITagRepository tagRepository ,ILikeRepository likeRepository ,IMapper mapper) : base(applicationDbContext)
+        private readonly IArticleRebository _articleRepository;
+        private readonly ITagRepository _tagRepository;
+        public readonly IArticleTagRebository _articleTagRepository;
+
+        public ArticleService(ApplicationDbContext applicationDbContext ,IArticleRebository articleRebository ,ITagRepository tagRepository ,ILikeRepository likeRepository ,IArticleTagRebository articleTagRepository ,IMapper mapper) : base(applicationDbContext)
         {
             _articleRepository = articleRebository;
             _tagRepository = tagRepository;
             _likeRepository = likeRepository;
+            _articleTagRepository = articleTagRepository;
             _mapper = mapper;
         }
 
@@ -35,7 +38,7 @@ namespace RealWord.DB.Services
             await _tagRepository.AddTags(tags);
             await SaveChangesAsync();
 
-            await _articleRepository.AddTagsToArticle(article.Slug ,tags);
+            await _articleTagRepository.AddTagsToArticle(article.Slug ,tags);
             await SaveChangesAsync();
             await transaction.CommitAsync();
 
@@ -50,7 +53,7 @@ namespace RealWord.DB.Services
             articleResponseDto.UpdatedDate = _articleRepository.GetUpdatedDate(articleDB.Slug);
             articleResponseDto.Favorited = _likeRepository.IsArticleLikedByUser(articleDB.ArticleId ,userId);
             articleResponseDto.FavoritesCount = _likeRepository.CountLikes(articleDB.ArticleId ,userId);
-            var Tags = _tagRepository.GetTagsOfArticle(slug);
+            var Tags = _articleTagRepository.GetTagsOfArticle(slug);
             List<string> tagsNames = new List<string>();
             foreach( var tag in Tags ) { tagsNames.Add(tag.Name); }
             articleResponseDto.TagList = tagsNames;
