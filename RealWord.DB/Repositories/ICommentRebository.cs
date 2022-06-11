@@ -9,7 +9,7 @@ namespace RealWord.DB.Repositories
     public interface ICommentRebository
     {
         public Task AddComment(Comment comment);
-        public IEnumerable<Comment> GetComments(string slug);
-        public Task RemoveComment(Comment comment);
+        public IEnumerable<Comment> GetComments(Article article);
+        public void RemoveComment(Comment comment);
     }
 }
