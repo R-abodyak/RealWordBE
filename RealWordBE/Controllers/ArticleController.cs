@@ -19,10 +19,10 @@ namespace RealWordBE.Controllers
     {
 
         private readonly IMapper _mapper;
-        private readonly ArticleService _articleService;
-        private readonly ProfileService _profileService;
+        private readonly IArticleService _articleService;
+        private readonly IProfileService _profileService;
 
-        public ArticleController(IMapper mapper ,ArticleService articleService ,ProfileService profileService)
+        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService)
         {
 
             _mapper = mapper;
@@ -33,17 +33,28 @@ namespace RealWordBE.Controllers
         [HttpGet("{slug}" ,Name = "GetArticle")]
         public async Task<ActionResult<ArticleResponseDto>> GetArticleAsync(string slug)
         {
+            var validSlug = _articleService.IsValidSlug(slug);
+            if( !validSlug )
+                return BadRequest(new Error()
+                {
+                    Status = "400" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = "Invalid Slug "
+                });
+
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
             var articleResponseDto = _articleService.GetAricleResponse(slug ,CurrentUserId);
-            if( articleResponseDto == null ) return BadRequest(new Error()
-            { ErrorMessage = "Invalid Slug" ,Status = "400" ,Tittle = "BadRequest" });
+            if( articleResponseDto == null )
+                return BadRequest(new Error()
+                { ErrorMessage = "Invalid Slug" ,Status = "400" ,Tittle = "BadRequest" });
             var profile = new ProfileResponseDto();
             profile.UserName = articleResponseDto.Author.UserName;
 
             //author of article 
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            profile = await _profileService.GetProfileAsync(SrcId ,profile.UserName);
+
+            profile = await _profileService.GetProfileAsync(CurrentUserName ,profile.UserName);
 
             if( profile == null )
             {
@@ -75,6 +86,7 @@ namespace RealWordBE.Controllers
             }
             var UserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             article.UserId = UserId;
+
 
             await _articleService.CreateArticleWithTag(article ,tags);
 

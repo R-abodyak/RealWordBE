@@ -16,23 +16,20 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class ProfileController:ControllerBase
     {
-        private readonly ProfileService _profileService;
-        private readonly IUserRepository _userReposotory;
+        private readonly IProfileService _profileService;
         private readonly IMapper _mapper;
         private readonly IFollowerRepository _followerRepository;
 
-        public ProfileController(ProfileService profileService ,IUserRepository userRepository ,IFollowerRepository folloewrRepository ,IMapper mapper)
+        public ProfileController(IProfileService profileService ,IMapper mapper)
         {
             _profileService = profileService;
-            _userReposotory = userRepository;
             _mapper = mapper;
-            _followerRepository = folloewrRepository;
         }
         [HttpGet(Name = "Profile")]
         public async Task<ActionResult<ProfileResponseDto>> GetProfile(string username)
         {
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var profile = await _profileService.GetProfileAsync(SrcId ,username);
+            var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var profile = await _profileService.GetProfileAsync(SrcUserName ,username);
             if( profile == null )
             {
                 return BadRequest(
@@ -50,28 +47,30 @@ namespace RealWordBE.Controllers
         [HttpPost("follow")]
         public async Task<ActionResult<ProfileResponseDto>> FollowUser(string username)
         {
+            var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
-            var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
-            if( dstUser == null ) return BadRequest(
+            var status = await _profileService.FollowUser(SrcUserName ,username);
+            if( status == FollowResult.Invalid )
+                return BadRequest(
                 new Error()
                 {
                     Status = "404" ,
                     Tittle = "Bad Request" ,
                     ErrorMessage = "Invalid User Name "
                 });
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            if( _followerRepository.IsFollowing(SrcId ,dstUser.Id) )
+
+
+            if( status == FollowResult.Duplicate )
             {
                 return BadRequest(
                 new Error()
                 {
                     Status = "404" ,
                     Tittle = "Bad Request" ,
-                    ErrorMessage = $"User with user name {username} is aleady followed "
+                    ErrorMessage = $"User with user name {username} is already followed "
                 });
             }
-            await _followerRepository.CreateFollow(SrcId ,dstUser.Id);
-            await _followerRepository.SaveChangesAsync();
+
 
             var profile = new ProfileResponseDto();
             profile.UserName = username;
@@ -85,34 +84,36 @@ namespace RealWordBE.Controllers
         public async Task<ActionResult<ProfileResponseDto>> UnFollowUser(string username)
         {
 
-            var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
-            if( dstUser == null ) return BadRequest(
+            var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+
+            var status = await _profileService.UnFollowUser(SrcUserName ,username);
+            if( status == FollowResult.Invalid )
+                return BadRequest(
                 new Error()
                 {
                     Status = "404" ,
                     Tittle = "Bad Request" ,
                     ErrorMessage = "Invalid User Name "
                 });
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
 
-            try { _followerRepository.RemoveFollow(SrcId ,dstUser.Id); }
-            catch( Exception )
+            if( status == FollowResult.Duplicate )
             {
-                if( !_followerRepository.IsFollowing(SrcId ,dstUser.Id) )
+                return BadRequest(
+                new Error()
                 {
-                    return BadRequest(
-                    new Error()
-                    {
-                        Status = "404" ,
-                        Tittle = "Bad Request" ,
-                        ErrorMessage = $"User with user name {username} is aleady Unfollowed "
-                    });
-                }
+                    Status = "404" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = $"User with user name {username} is already followed "
+                });
             }
-            await _followerRepository.SaveChangesAsync();
+
+
+            var profile = new ProfileResponseDto();
+            profile.UserName = username;
 
             return RedirectToRoute("Profile" ,new { username = username });
+
 
         }
 

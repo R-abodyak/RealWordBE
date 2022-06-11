@@ -31,7 +31,7 @@ namespace RealWord.DB.Services
             using var transaction =
                    await _context.Database.BeginTransactionAsync();
             await _articleRepository.AddArticle(article);
-            await SaveChangesAsync();
+
             await _tagRepository.AddTags(tags);
             await SaveChangesAsync();
 

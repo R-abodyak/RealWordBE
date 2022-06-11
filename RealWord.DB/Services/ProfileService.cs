@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RealWord.DB.Services
 {
-    public class ProfileService:BaseRepository
+    public class ProfileService:BaseRepository, IProfileService
     {
         private readonly IFollowerRepository _followerRepository;
 
@@ -25,16 +25,57 @@ namespace RealWord.DB.Services
             _mapper = mapper;
         }
 
-        public async Task<ProfileResponseDto> GetProfileAsync(string SrcId ,string username)
+        public async Task<ProfileResponseDto> GetProfileAsync(string SrcUserName ,string DestinationUsername)
         {
-            var dstUser = await _userReposotory.GetUserByUsernameAsync(username);
+            var SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
+            if( SrcUser == null ) return null;
+            var dstUser = await _userReposotory.GetUserByUsernameAsync(DestinationUsername);
             if( dstUser == null ) return null;
+
             var profile = _mapper.Map<ProfileResponseDto>(dstUser);
 
 
-            if( SrcId != null )
-                profile.Following = _followerRepository.IsFollowing(SrcId ,dstUser.Id);
+            if( SrcUserName != null )
+                profile.Following = _followerRepository.IsFollowing(SrcUser.Id ,dstUser.Id);
+
             return profile;
         }
+
+        public async Task<FollowResult> FollowUser(string SrcUserName ,string DestinationUserName)
+        {
+            var dstUser = await _userReposotory.GetUserByUsernameAsync(DestinationUserName);
+            if( dstUser == null ) { return FollowResult.Invalid; }
+
+            var SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
+
+            if( _followerRepository.IsFollowing(SrcUser.Id ,dstUser.Id) )
+            {
+                return FollowResult.Duplicate;
+            }
+            await _followerRepository.CreateFollow(SrcUser.Id ,dstUser.Id);
+            await _followerRepository.SaveChangesAsync();
+            return FollowResult.Completed;
+
+        }
+        public async Task<FollowResult> UnFollowUser(string SrcUserName ,string DestinationUserName)
+        {
+            var dstUser = await _userReposotory.GetUserByUsernameAsync(DestinationUserName);
+            if( dstUser == null ) { return FollowResult.Invalid; }
+
+            var SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
+
+            try { _followerRepository.RemoveFollow(SrcUser.Id ,dstUser.Id); }
+            catch( Exception )
+            {
+                if( !_followerRepository.IsFollowing(SrcUser.Id ,dstUser.Id) )
+                {
+                    return FollowResult.Duplicate;
+                }
+            }
+            await _followerRepository.SaveChangesAsync();
+            return FollowResult.Completed;
+
+        }
+
     }
 }

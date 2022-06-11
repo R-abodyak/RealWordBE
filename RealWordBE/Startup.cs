@@ -44,8 +44,8 @@ namespace RealWordBE
             services.AddScoped<ITagRepository ,TagRepository>();
             services.AddScoped<IFollowerRepository ,FollowerRepository>();
             services.AddScoped<IArticleRebository ,ArticleRebository>();
-            services.AddScoped<ArticleService>();
-            services.AddScoped<ProfileService>();
+            services.AddScoped<IArticleService ,ArticleService>();
+            services.AddScoped<IProfileService ,ProfileService>();
 
 
 
