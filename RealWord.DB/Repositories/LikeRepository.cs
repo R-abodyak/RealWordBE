@@ -41,7 +41,8 @@ namespace RealWord.DB.Repositories
 
         void ILikeRepository.DeleteLike(int ArticleId ,string UserId)
         {
-            _context.Remove(new Like() { ArticleId = ArticleId ,User_id = UserId });
+            var entity = _context.Likes.Where(a => a.ArticleId == ArticleId && a.User_id == UserId).FirstOrDefault();
+            _context.Remove(entity);
         }
     }
 }

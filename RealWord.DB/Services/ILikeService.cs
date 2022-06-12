@@ -8,6 +8,6 @@ namespace RealWord.DB.Services
     public interface ILikeService
     {
         Task<Status> CreateLikeAsync(string slug ,string UserId);
-        Task<Status> DeleteLikeAsync(string slug ,string UserId)
+        Task<Status> DeleteLikeAsync(string slug ,string UserId);
     }
 }

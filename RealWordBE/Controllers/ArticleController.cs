@@ -165,6 +165,31 @@ namespace RealWordBE.Controllers
 
 
         }
+        [Authorize]
+        [HttpDelete("{slug}/favorite")]
+        public async Task<IActionResult> DeleteLike(string slug)
+        {
+            bool validSlug = _articleService.IsValidSlug(slug);
+            if( !validSlug ) return BadRequest(new Error()
+            {
+                Status = "400" ,
+                Tittle = "Bad Request" ,
+                ErrorMessage = "Invalid Slug "
+            });
+            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var isLiked = await _likeService.DeleteLikeAsync(slug ,SrcId);
+            if( isLiked == Status.Duplicate )
+                return BadRequest(new Error()
+                {
+                    Status = "400" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = $"Already UnFaviourte Article "
+                });
+            return NoContent();
+
+
+
+        }
 
     }
 }
