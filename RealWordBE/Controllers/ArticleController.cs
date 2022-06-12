@@ -6,6 +6,7 @@ using RealWord.DB.Models;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.ResponseDtos;
+using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWord.DB.Repositories;
 using RealWord.DB.Services;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace RealWordBE.Controllers
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
-        public async Task<ActionResult<ArticleResponseDto>> GetArticleAsync(string slug)
+        public async Task<ActionResult<ArticleResponseOuterDto>> GetArticleAsync(string slug)
         {
             var validSlug = _articleService.IsValidSlug(slug);
             if( !validSlug )
@@ -69,13 +70,14 @@ namespace RealWordBE.Controllers
                       });
             }
             articleResponseDto.Author = profile;
-            return Ok(articleResponseDto);
+            var response = new ArticleResponseOuterDto() { Article = articleResponseDto };
+            return Ok(response);
 
         }
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<ArticleResponseDto>> CreateArticle(ArticleOuterDto articleOuterDto)
+        public async Task<ActionResult<ArticleResponseOuterDto>> CreateArticle(ArticleOuterDto articleOuterDto)
         {
             var articleDto = articleOuterDto.ArticleDto;
             var article = _mapper.Map<Article>(articleDto);

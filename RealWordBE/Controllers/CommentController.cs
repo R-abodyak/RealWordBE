@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Models;
 using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.ResponseDtos;
+using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWord.DB.Services;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace RealWordBE.Controllers
         }
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<CommentResponseDto>> CreateComment(string slug ,CommentOuterDto commentOuterDto)
+        public async Task<ActionResult<CommentResponseOuterDto>> CreateComment(string slug ,CommentOuterDto commentOuterDto)
         {
             var commentDto = commentOuterDto.CommentDto;
             var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
@@ -38,13 +39,14 @@ namespace RealWordBE.Controllers
 
             //get comment
             var commentResponse = await _commentService.GetCommentResponse(commentId ,slug ,CurrentUserName);
+            var response = new CommentResponseOuterDto() { Comment = commentResponse };
 
 
-            return Ok(commentResponse);
+            return Ok(response);
 
         }
         [HttpGet]
-        public async Task<ActionResult<CommentResponseDto>> GetComments(string slug)
+        public async Task<ActionResult<CommentsResponseOuterDto>> GetComments(string slug)
         {
             var currentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
@@ -58,7 +60,11 @@ namespace RealWordBE.Controllers
                     ErrorMessage = "Invalid Slug "
                 });
             }
-            return Ok(result);
+            var response = new CommentsResponseOuterDto() { Comments = result };
+
+
+            return Ok(response);
+
         }
         [Authorize]
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealWord.DB.Models;
 using RealWord.DB.Models.ResponseDtos;
+using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWord.DB.Repositories;
 using RealWord.DB.Services;
 using RealWordBE.Authentication;
@@ -17,15 +18,14 @@ namespace RealWordBE.Controllers
     public class ProfileController:ControllerBase
     {
         private readonly IProfileService _profileService;
-        private readonly IMapper _mapper;
 
-        public ProfileController(IProfileService profileService ,IMapper mapper)
+        public ProfileController(IProfileService profileService)
         {
             _profileService = profileService;
-            _mapper = mapper;
+
         }
         [HttpGet(Name = "Profile")]
-        public async Task<ActionResult<ProfileResponseDto>> GetProfile(string username)
+        public async Task<ActionResult<ProfileResponseOuterDto>> GetProfile(string username)
         {
             var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
             var profile = await _profileService.GetProfileAsync(SrcUserName ,username);
@@ -39,12 +39,13 @@ namespace RealWordBE.Controllers
                           ErrorMessage = "Invalid User Name "
                       });
             }
+            var response = new ProfileResponseOuterDto() { Profile = profile };
 
-            return Ok(profile);
+            return Ok(response);
         }
         [Authorize]
         [HttpPost("follow")]
-        public async Task<ActionResult<ProfileResponseDto>> FollowUser(string username)
+        public async Task<ActionResult<ProfileResponseOuterDto>> FollowUser(string username)
         {
             var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
@@ -80,7 +81,7 @@ namespace RealWordBE.Controllers
         }
         [Authorize]
         [HttpDelete("follow")]
-        public async Task<ActionResult<ProfileResponseDto>> UnFollowUser(string username)
+        public async Task<ActionResult<ProfileResponseOuterDto>> UnFollowUser(string username)
         {
 
             var SrcUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;

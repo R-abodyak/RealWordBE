@@ -8,6 +8,7 @@ using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.Response_Dtos;
+using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
 using System.Collections.Generic;
@@ -41,7 +42,8 @@ namespace RealWordBE.Controllers
             if( result == "Success" )
             {
                 var response = _mapper.Map<UserResponseDto>(user);
-                return Ok(response);
+                var outerResponse = new UserResponseOuterDto() { User = response };
+                return Ok(outerResponse);
             }
             else
                 return BadRequest(new Error
@@ -70,9 +72,10 @@ namespace RealWordBE.Controllers
             else
             {
                 var token = await _userReposotory.CreateJwtToken(userEntity);
-                var respone = _mapper.Map<UserResponseDto>(userEntity);
-                respone.Token = token;
-                return Ok(respone);
+                var response = _mapper.Map<UserResponseDto>(userEntity);
+                response.Token = token;
+                var outerResponse = new UserResponseOuterDto() { User = response };
+                return Ok(outerResponse);
             }
 
         }
@@ -95,7 +98,8 @@ namespace RealWordBE.Controllers
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == null ) return Unauthorized();
             userResponseDto.Token = token;
-            return Ok(userResponseDto);
+            var outerResponse = new UserResponseOuterDto() { User = userResponseDto };
+            return Ok(outerResponse);
 
         }
         [HttpPut("user")]
@@ -114,8 +118,8 @@ namespace RealWordBE.Controllers
 
             var userResponseDto = _mapper.Map<UserResponseDto>(currentUser);
             userResponseDto.Token = null;
-            return Ok(userResponseDto);
-
+            var outerResponse = new UserResponseOuterDto() { User = userResponseDto };
+            return Ok(outerResponse);
 
 
         }
