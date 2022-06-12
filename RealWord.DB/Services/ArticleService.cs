@@ -16,7 +16,8 @@ namespace RealWord.DB.Services
         private readonly IMapper _mapper;
         private readonly IArticleRebository _articleRepository;
         private readonly ITagRepository _tagRepository;
-        public readonly IArticleTagRebository _articleTagRepository;
+        private readonly IArticleTagRebository _articleTagRepository;
+
 
         public ArticleService(ApplicationDbContext applicationDbContext ,IArticleRebository articleRebository ,ITagRepository tagRepository ,ILikeRepository likeRepository ,IArticleTagRebository articleTagRepository ,IMapper mapper) : base(applicationDbContext)
         {
@@ -43,7 +44,7 @@ namespace RealWord.DB.Services
             await transaction.CommitAsync();
 
         }
-        public ArticleResponseDto GetAricleResponse(string slug ,String userId)
+        public async Task<ArticleResponseDto> GetAricleResponseAsync(IProfileService profileService ,string slug ,String userId ,String CurrentUserName)
         {
             var articleDB = _articleRepository.GetArticleBySlug(slug);
             if( articleDB == null ) return null;
@@ -57,10 +58,9 @@ namespace RealWord.DB.Services
             List<string> tagsNames = new List<string>();
             foreach( var tag in Tags ) { tagsNames.Add(tag.Name); }
             articleResponseDto.TagList = tagsNames;
-            articleResponseDto.Author = new ProfileResponseDto()
-            {
-                UserName = _articleRepository.GetAuthorofArticle(slug).UserName
-            };
+            var AuthoruserName = _articleRepository.GetAuthorofArticle(slug).UserName;
+            articleResponseDto.Author = await profileService.GetProfileAsync(CurrentUserName ,AuthoruserName);
+
 
             return articleResponseDto;
 

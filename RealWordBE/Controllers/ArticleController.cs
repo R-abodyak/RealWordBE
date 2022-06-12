@@ -48,28 +48,12 @@ namespace RealWordBE.Controllers
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
-            var articleResponseDto = _articleService.GetAricleResponse(slug ,CurrentUserId);
+            var articleResponseDto = await _articleService.GetAricleResponseAsync(_profileService ,slug ,CurrentUserId ,CurrentUserName);
             if( articleResponseDto == null )
                 return BadRequest(new Error()
                 { ErrorMessage = "Invalid Slug" ,Status = "400" ,Tittle = "BadRequest" });
-            var profile = new ProfileResponseDto();
-            profile.UserName = articleResponseDto.Author.UserName;
 
-            //author of article 
 
-            profile = await _profileService.GetProfileAsync(CurrentUserName ,profile.UserName);
-
-            if( profile == null )
-            {
-                return BadRequest(
-                      new Error()
-                      {
-                          Status = "400" ,
-                          Tittle = "Bad Request" ,
-                          ErrorMessage = "Invalid User Name "
-                      });
-            }
-            articleResponseDto.Author = profile;
             var response = new ArticleResponseOuterDto() { Article = articleResponseDto };
             return Ok(response);
 

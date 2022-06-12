@@ -1,4 +1,5 @@
-﻿using RealWord.DB.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using RealWord.DB.Entities;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using System;
@@ -11,7 +12,7 @@ namespace RealWord.DB.Services
     public interface IArticleService
     {
         Task CreateArticleWithTag(Article article ,List<Tag> tags);
-        ArticleResponseDto GetAricleResponse(string slug ,String userId);
+        Task<ArticleResponseDto> GetAricleResponseAsync([FromServices] IProfileService profileService ,string slug ,String userId ,string CurrentUserName);
         Task UpdateArticle(string slug ,ArticleForUpdateDto UpdatedArticle);
         Task DeleteArticle(string slug);
         bool IsArticleAuthor(String slug ,string currentUserId);
