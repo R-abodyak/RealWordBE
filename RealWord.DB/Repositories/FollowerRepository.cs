@@ -6,6 +6,7 @@ using RealWord.DB.Entities;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq;
 
 namespace RealWord.DB.Repositories
 {
@@ -32,6 +33,12 @@ namespace RealWord.DB.Repositories
             f1.UserId = SrcId; f1.followerId = DstId;
             _context.Remove(f1);
             _context.SaveChanges();
+        }
+        public async Task<List<Folower>> GetFollowers(string userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            return user.followers;
+
         }
     }
 }

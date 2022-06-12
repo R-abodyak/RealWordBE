@@ -107,23 +107,27 @@ namespace RealWord.DB.Services
 
         async Task<IEnumerable<Article>> IArticleService.ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author)
         {
-            Tag tag1;
-            if( limit == 0 ) limit = 20;
-            int tagId = 0; User Author, favoritedUser; string favoritedUserId = null; string authorId = null;
-            if( tag != null ) { tag1 = await _tagRepository.GetTagByName(tag); tagId = tag1.TagId; }
-            if( author != null )
+            try
             {
-                Author = await _userRepository.GetUserByUsernameAsync(author);
-                authorId = Author.Id;
-            }
-            if( favorited != null )
-            {
-                favoritedUser = await _userRepository.GetUserByUsernameAsync(favorited);
-                favoritedUserId = favoritedUser.Id;
-            }
+                Tag tag1;
+                if( limit == 0 ) limit = 20;
+                int tagId = 0; User Author, favoritedUser; string favoritedUserId = null; string authorId = null;
+                if( tag != null ) { tag1 = await _tagRepository.GetTagByName(tag); tagId = tag1.TagId; }
+                if( author != null )
+                {
+                    Author = await _userRepository.GetUserByUsernameAsync(author);
+                    authorId = Author.Id;
+                }
+                if( favorited != null )
+                {
+                    favoritedUser = await _userRepository.GetUserByUsernameAsync(favorited);
+                    favoritedUserId = favoritedUser.Id;
+                }
 
-            var result = _articleRepository.ListArticlesWithFilters(limit ,offset ,tagId ,authorId ,favoritedUserId);
-            return result;
+                var result = _articleRepository.ListArticlesWithFilters(limit ,offset ,tagId ,favoritedUserId ,authorId);
+                return result;
+            }
+            catch( Exception ) { return null; }
         }
     }
 }

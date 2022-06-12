@@ -12,6 +12,7 @@ namespace RealWord.DB.Repositories
         //Task CreateFollow(string SrcId ,string DstId);
         Task<Folower> CreateFollow(string SrcId ,string DstId);
         void RemoveFollow(string SrcId ,string DstId);
+        Task<IEnumerable<Folower>> GetFollowers(string userId);
         Task SaveChangesAsync();
     }
 }

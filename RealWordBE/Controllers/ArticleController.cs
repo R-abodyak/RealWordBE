@@ -184,6 +184,7 @@ namespace RealWordBE.Controllers
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
             var articles = await _articleService.ListArticlesWithFilters(limit ,offset ,tag ,favorited ,author);
+            if( articles == null ) return BadRequest(new Error() { ErrorMessage = "Invalid input" ,Status = "400" ,Tittle = "Bad Request" });
             List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
             foreach( var article in articles )
             {
