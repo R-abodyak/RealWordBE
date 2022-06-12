@@ -53,7 +53,53 @@ namespace RealWordBE.Controllers
             var currentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
             var result = await _commentService.GetComments(slug ,currentUserName);
+            if( result == null )
+            {
+                return BadRequest(new Error()
+                {
+                    Status = "400" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = "Invalid Slug "
+                });
+            }
             return Ok(result);
+        }
+        [Authorize]
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteComments(string slug ,int id)
+        {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var currentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var result = await _commentService.GetCommentAsync(id);
+            if( result == null )
+                return BadRequest(new Error()
+                {
+                    Status = "400" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = "Invalid Comment Id  "
+                });
+            bool isAuthor = await _commentService.DoesUserMatchAuthorAsync(id ,currentUserId);
+            if( isAuthor == false )
+                return Forbid("permission denied ,users cant delete others comments");
+
+            var comments = await _commentService.GetComments(slug ,currentUserName);
+            if( comments == null )
+                return BadRequest(new Error()
+                {
+                    Status = "400" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = "Invalid Slug or No coment Belong to slug"
+                });
+            var isCommentIdBelongToSlug = comments.Where(A => A.CommentId == id).Any();
+            if( !isCommentIdBelongToSlug ) return BadRequest(new Error()
+            {
+                Status = "400" ,
+                Tittle = "Bad Request" ,
+                ErrorMessage = "Comment Not belong to Slug"
+            });
+            await _commentService.RemoveComment(id);
+            return NoContent();
         }
     }
 }

@@ -45,5 +45,6 @@ namespace RealWord.DB.Repositories
         {
             _context.Remove(comment);
         }
+
     }
 }

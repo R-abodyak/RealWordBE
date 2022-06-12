@@ -60,6 +60,7 @@ namespace RealWord.DB.Services
         public async Task<IEnumerable<CommentResponseDto>> GetComments(string slug ,string CurrentUserName)
         {
             var comments = _commentRebository.GetComments(slug);
+            if( comments == null ) return null;
             IList<CommentResponseDto> responses = new List<CommentResponseDto>();
             foreach( var comment in comments )
             {
@@ -82,6 +83,29 @@ namespace RealWord.DB.Services
             return commentResponse;
         }
 
+        public async Task RemoveComment(int id)
+        {
+            var comment = await _commentRebository.GetComment(id);
+            if( comment == null ) return;
+            _commentRebository.RemoveComment(comment);
+            await SaveChangesAsync();
+
+        }
+
+        public async Task<bool> DoesUserMatchAuthorAsync(int commentId ,string userId)
+        {
+            var comment = await _commentRebository.GetComment(commentId);
+            if( comment == null ) return false;
+            if( userId == comment.User_id ) return true;
+
+            return false;
+        }
+
+        public async Task<Comment> GetCommentAsync(int id)
+        {
+            return await _commentRebository.GetComment(id);
+
+        }
 
     }
 }
