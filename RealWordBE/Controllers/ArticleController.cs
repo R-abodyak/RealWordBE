@@ -176,6 +176,23 @@ namespace RealWordBE.Controllers
 
 
         }
+        [HttpGet]
+        public async Task<ActionResult<ArticlesResponseOuterDto>> ListArticlesWithFilters
+            ([FromQuery] string tag ,[FromQuery] string author ,[FromQuery] string favorited ,
+            [FromQuery] int limit ,[FromQuery] int offset)
+        {
+            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var articles = await _articleService.ListArticlesWithFilters(limit ,offset ,tag ,favorited ,author);
+            List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
+            foreach( var article in articles )
+            {
+                var element = await _articleService.GetAricleResponseAsync(_profileService ,article.Slug ,CurrentUserId ,CurrentUserName);
+                articlResponseList.Add(element);
+            }
+            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
+            return Ok(result);
 
+        }
     }
 }

@@ -3,6 +3,7 @@ using RealWord.DB.Entities;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
+using RealWordBE.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,14 +18,17 @@ namespace RealWord.DB.Services
         private readonly IArticleRebository _articleRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IArticleTagRebository _articleTagRepository;
+        private readonly IUserRepository _userRepository;
 
-
-        public ArticleService(ApplicationDbContext applicationDbContext ,IArticleRebository articleRebository ,ITagRepository tagRepository ,ILikeRepository likeRepository ,IArticleTagRebository articleTagRepository ,IMapper mapper) : base(applicationDbContext)
+        public ArticleService(ApplicationDbContext applicationDbContext ,IArticleRebository articleRebository ,
+            ITagRepository tagRepository ,ILikeRepository likeRepository ,
+            IArticleTagRebository articleTagRepository ,IUserRepository userRepository ,IMapper mapper) : base(applicationDbContext)
         {
             _articleRepository = articleRebository;
             _tagRepository = tagRepository;
             _likeRepository = likeRepository;
             _articleTagRepository = articleTagRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
@@ -101,5 +105,25 @@ namespace RealWord.DB.Services
         }
 
 
+        async Task<IEnumerable<Article>> IArticleService.ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author)
+        {
+            Tag tag1;
+            if( limit == 0 ) limit = 20;
+            int tagId = 0; User Author, favoritedUser; string favoritedUserId = null; string authorId = null;
+            if( tag != null ) { tag1 = await _tagRepository.GetTagByName(tag); tagId = tag1.TagId; }
+            if( author != null )
+            {
+                Author = await _userRepository.GetUserByUsernameAsync(author);
+                authorId = Author.Id;
+            }
+            if( favorited != null )
+            {
+                favoritedUser = await _userRepository.GetUserByUsernameAsync(favorited);
+                favoritedUserId = favoritedUser.Id;
+            }
+
+            var result = _articleRepository.ListArticlesWithFilters(limit ,offset ,tagId ,authorId ,favoritedUserId);
+            return result;
+        }
     }
 }

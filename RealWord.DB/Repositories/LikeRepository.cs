@@ -25,8 +25,9 @@ namespace RealWord.DB.Repositories
         {
             try
             {
-                var result = _context.Articles.Find(ArticleId).Likes.Where(l => l.User_id == UserId).Count();
-                return result;
+                var result = _context.Articles.Find(ArticleId);
+                var result2 = result.Likes.Count();
+                return result2;
 
             }
             catch( Exception ) { return 0; }

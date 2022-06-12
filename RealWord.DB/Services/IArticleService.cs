@@ -17,5 +17,6 @@ namespace RealWord.DB.Services
         Task DeleteArticle(string slug);
         bool IsArticleAuthor(String slug ,string currentUserId);
         bool IsValidSlug(string slug);
+        Task<IEnumerable<Article>> ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author);
     }
 }

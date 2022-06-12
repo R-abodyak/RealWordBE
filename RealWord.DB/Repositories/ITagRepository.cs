@@ -10,6 +10,7 @@ namespace RealWord.DB.Repositories
     {
         Task AddTags(List<Tag> tagList);
         Task<List<Tag>> GetAllTagsAsync();
+        Task<Tag> GetTagByName(string name);
 
 
     }

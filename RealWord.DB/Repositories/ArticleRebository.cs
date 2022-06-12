@@ -15,7 +15,8 @@ namespace RealWord.DB.Repositories
         }
         public IEnumerable<Article> ListArticlesWithFilters(int limit ,int offset ,int tagId ,string favoritedUserId ,string authorId)
         {
-            var articles = _context.Articles.AsNoTracking().
+
+            var articles = _context.Articles.OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate")).
                 Include(a => a.ArticleTags).
                 Include(a => a.Likes).ToList();
             // var articles = _context.Articles.ToList();
@@ -37,7 +38,8 @@ namespace RealWord.DB.Repositories
                     (a => a.Likes.Where(a => a.User_id == favoritedUserId).Count() > 0).ToList();
             }
 
-            return articles.OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate")).Skip(offset).Take(limit);
+            return articles.Skip(offset).Take(limit);
+            //
         }
 
         public async Task AddArticle(Article article)
