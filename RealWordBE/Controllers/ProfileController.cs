@@ -34,7 +34,7 @@ namespace RealWordBE.Controllers
                 return BadRequest(
                       new Error()
                       {
-                          Status = "404" ,
+                          Status = "400" ,
                           Tittle = "Bad Request" ,
                           ErrorMessage = "Invalid User Name "
                       });
@@ -53,7 +53,7 @@ namespace RealWordBE.Controllers
                 return BadRequest(
                 new Error()
                 {
-                    Status = "404" ,
+                    Status = "400" ,
                     Tittle = "Bad Request" ,
                     ErrorMessage = "Invalid User Name "
                 });
@@ -64,7 +64,7 @@ namespace RealWordBE.Controllers
                 return BadRequest(
                 new Error()
                 {
-                    Status = "404" ,
+                    Status = "400" ,
                     Tittle = "Bad Request" ,
                     ErrorMessage = $"User with user name {username} is already followed "
                 });
@@ -90,7 +90,7 @@ namespace RealWordBE.Controllers
                 return BadRequest(
                 new Error()
                 {
-                    Status = "404" ,
+                    Status = "400" ,
                     Tittle = "Bad Request" ,
                     ErrorMessage = "Invalid User Name "
                 });
@@ -101,7 +101,7 @@ namespace RealWordBE.Controllers
                 return BadRequest(
                 new Error()
                 {
-                    Status = "404" ,
+                    Status = "400" ,
                     Tittle = "Bad Request" ,
                     ErrorMessage = $"User with user name {username} is already followed "
                 });

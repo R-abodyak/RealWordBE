@@ -21,13 +21,15 @@ namespace RealWordBE.Controllers
         private readonly IMapper _mapper;
         private readonly IArticleService _articleService;
         private readonly IProfileService _profileService;
+        private readonly ILikeService _likeService;
 
-        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService)
+        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService ,ILikeService likeService)
         {
 
             _mapper = mapper;
             _articleService = articleService;
             _profileService = profileService;
+            _likeService = likeService;
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
@@ -138,5 +140,31 @@ namespace RealWordBE.Controllers
             return NoContent();
 
         }
+        [Authorize]
+        [HttpPost("{slug}/favorite")]
+        public async Task<IActionResult> CreateLike(string slug)
+        {
+            bool validSlug = _articleService.IsValidSlug(slug);
+            if( !validSlug ) return BadRequest(new Error()
+            {
+                Status = "400" ,
+                Tittle = "Bad Request" ,
+                ErrorMessage = "Invalid Slug "
+            });
+            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var isLiked = await _likeService.CreateLikeAsync(slug ,SrcId);
+            if( isLiked == Status.Duplicate )
+                return BadRequest(new Error()
+                {
+                    Status = "400" ,
+                    Tittle = "Bad Request" ,
+                    ErrorMessage = $"Already Faviourte Article "
+                });
+            return RedirectToRoute("GetArticle" ,new { slug = slug });
+
+
+
+        }
+
     }
 }

@@ -14,16 +14,12 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class CommentController:ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly ICommentService _commentService;
-        private readonly IProfileService _profileService;
 
-        public CommentController(IMapper mapper ,ICommentService commentService ,IProfileService profileService)
+        public CommentController(ICommentService commentService)
         {
 
-            _mapper = mapper;
             _commentService = commentService;
-            _profileService = profileService;
         }
         [Authorize]
         [HttpPost]
@@ -89,7 +85,7 @@ namespace RealWordBE.Controllers
                 {
                     Status = "400" ,
                     Tittle = "Bad Request" ,
-                    ErrorMessage = "Invalid Slug or No coment Belong to slug"
+                    ErrorMessage = "Invalid Slug or No comment Belong to slug"
                 });
             var isCommentIdBelongToSlug = comments.Where(A => A.CommentId == id).Any();
             if( !isCommentIdBelongToSlug ) return BadRequest(new Error()

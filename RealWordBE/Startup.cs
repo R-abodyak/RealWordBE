@@ -51,6 +51,7 @@ namespace RealWordBE
             services.AddScoped<IArticleService ,ArticleService>();
             services.AddScoped<IProfileService ,ProfileService>();
             services.AddScoped<ICommentService ,CommentService>();
+            services.AddScoped<ILikeService ,LikeService>();
 
 
 
