@@ -4,13 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RealWord.DB.Repositories
+namespace RealWord.DB.Services
 {
-    public interface ITagRepository
+    public interface ITagService
     {
-        Task AddTags(List<Tag> tagList);
         Task<List<Tag>> GetAllTagsAsync();
-
-
     }
 }
