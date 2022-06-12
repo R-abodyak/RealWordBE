@@ -6,7 +6,7 @@ using RealWord.DB.Entities;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Linq;
+
 
 namespace RealWord.DB.Repositories
 {
@@ -40,5 +40,21 @@ namespace RealWord.DB.Repositories
             return user.followers;
 
         }
+
+        public IEnumerable<Article> GetArticlesOfFolowers(List<Folower> followers ,int limit ,int offset)
+        {
+
+            if( followers == null ) return null;
+            var articles = _context.Articles
+                .OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate"))
+                .Take(limit)
+                .Skip(offset)
+                .Where(a => a.UserId ==
+                                   followers.Select(f => f.UserId)
+                                   .Where(f => f == a.UserId).FirstOrDefault()).ToList();
+
+            return articles;
+        }
+
     }
 }
