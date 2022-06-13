@@ -25,12 +25,16 @@ namespace RealWordBE.Controllers
             _commentService = commentService;
             _tokenManager = tokenManager;
         }
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult<CommentResponseOuterDto>> CreateComment(string slug ,CommentOuterDto commentOuterDto)
         {
             var commentDto = commentOuterDto.CommentDto;
-            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            var tokens = _tokenManager.ExtractClaims(token);
+
+            var CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
             var commentId = await _commentService.CreateComment(CurrentUserName ,slug ,commentDto);
             if( commentId == -1 )
                 return BadRequest(new Error()
@@ -75,13 +79,17 @@ namespace RealWordBE.Controllers
             return Ok(response);
 
         }
-        [Authorize]
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteComments(string slug ,int id)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var currentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            var tokens = _tokenManager.ExtractClaims(token);
+
+            var CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
+            var currentUserId = tokens.Claims.First(claim => claim.Type == "username").Value;
+
             var result = await _commentService.GetCommentAsync(id);
             if( result == null )
                 return BadRequest(new Error()
