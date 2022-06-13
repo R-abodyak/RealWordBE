@@ -49,12 +49,11 @@ namespace RealWord.DB.Repositories
             List<Article> articleslist = new List<Article>();
             var articles = _context.Articles
                 .OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate")).ToList();
-            foreach( var f in followers )
-            {
-                element = articles.Where(a => a.UserId == f.followerId).FirstOrDefault();
-                articleslist.Add(element);
-            }
-            var result = articleslist.Skip(offset).Take(limit).ToList();
+
+            var x = articles.Where(a => a.UserId == followers.Select(F => F.followerId).Where(F => F == a.UserId).FirstOrDefault()).ToList();
+
+
+            var result = x.Skip(offset).Take(limit).ToList();
             return result;
 
             //
