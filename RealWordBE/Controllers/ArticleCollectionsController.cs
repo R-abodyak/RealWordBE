@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
 using RealWord.DB.Models.RequestDtos;
@@ -9,26 +10,31 @@ using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWord.DB.Repositories;
 using RealWord.DB.Services;
+using RealWordBE.Authentication.Logout;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 namespace RealWordBE.Controllers
 {
+
     [Route("api/articles")]
     [ApiController]
     public class ArticleCollectionsController:ControllerBase
     {
-
+        private readonly ITokenManager _tokenManager;
         private readonly IArticleService _articleService;
         private readonly IProfileService _profileService;
         private readonly IFollowerRepository _followerRepository;
+        private readonly ILogger<ArticleCollectionsController> _logger;
 
-        public ArticleCollectionsController(IArticleService articleService ,IProfileService profileService ,IFollowerRepository followerRepository)
+        public ArticleCollectionsController(ILogger<ArticleCollectionsController> logger ,ITokenManager tokenManager ,IArticleService articleService ,IProfileService profileService ,IFollowerRepository followerRepository)
         {
-
+            _tokenManager = tokenManager;
             _articleService = articleService;
             _profileService = profileService;
             _followerRepository = followerRepository;
+            _logger = logger;
+
         }
 
 
@@ -38,14 +44,20 @@ namespace RealWordBE.Controllers
                 ([FromQuery] string tag ,[FromQuery] string author ,[FromQuery] string favorited ,
                 [FromQuery] int limit ,[FromQuery] int offset)
         {
-            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            string CurrentUserId = null; string CurrentUserName = null;
+            if( token != string.Empty )
+            {
+                var tokens = _tokenManager.ExtractClaims(token);
+                CurrentUserId = tokens.Claims.First(claim => claim.Type == "uid").Value;
+                CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
+            }
             var articles = await _articleService.ListArticlesWithFilters(limit ,offset ,tag ,favorited ,author);
             if( articles == null ) return BadRequest(new Error() { ErrorMessage = "Invalid input" ,Status = "400" ,Tittle = "Bad Request" });
             List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
             foreach( var article in articles )
             {
-                var element = await _articleService.GetAricleResponseAsync(_profileService ,article.Slug ,CurrentUserId ,CurrentUserName);
+                var element = await _articleService.GetAricleResponseAsync(_profileService ,article ,CurrentUserId ,CurrentUserName);
                 articlResponseList.Add(element);
             }
             var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
@@ -64,7 +76,7 @@ namespace RealWordBE.Controllers
             List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
             foreach( var article in articles )
             {
-                var element = await _articleService.GetAricleResponseAsync(_profileService ,article.Slug ,CurrentUserId ,CurrentUserName);
+                var element = await _articleService.GetAricleResponseAsync(_profileService ,article ,CurrentUserId ,CurrentUserName);
                 articlResponseList.Add(element);
             }
             var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };

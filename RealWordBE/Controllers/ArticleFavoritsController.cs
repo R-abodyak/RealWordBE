@@ -9,6 +9,7 @@ using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWord.DB.Repositories;
 using RealWord.DB.Services;
+using RealWordBE.Authentication.Logout;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,31 +19,37 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class ArticleFavoritsController:ControllerBase
     {
-
+        private readonly ITokenManager _tokenManager;
+        private readonly IProfileService _profileService;
         private readonly IArticleService _articleService;
         private readonly ILikeService _likeService;
 
 
-        public ArticleFavoritsController(IArticleService articleService ,ILikeService likeService)
+        public ArticleFavoritsController(ITokenManager tokenManager ,IProfileService profileService ,IArticleService articleService ,ILikeService likeService)
         {
-
+            _tokenManager = tokenManager;
+            _profileService = profileService;
             _articleService = articleService;
             _likeService = likeService;
         }
 
 
-        [Authorize]
+        // [Authorize]
         [HttpPost("{slug}/favorite")]
         public async Task<IActionResult> CreateLike(string slug)
         {
-            bool validSlug = _articleService.IsValidSlug(slug);
-            if( !validSlug ) return BadRequest(new Error()
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            var tokens = _tokenManager.ExtractClaims(token);
+
+            var article = _articleService.GetArticle(slug);
+            if( article == null ) return BadRequest(new Error()
             {
                 Status = "400" ,
                 Tittle = "Bad Request" ,
                 ErrorMessage = "Invalid Slug "
             });
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var SrcId = tokens.Claims.First(claim => claim.Type == "uid").Value;
             var isLiked = await _likeService.CreateLikeAsync(slug ,SrcId);
             if( isLiked == Status.Duplicate )
                 return BadRequest(new Error()
@@ -56,18 +63,22 @@ namespace RealWordBE.Controllers
 
 
         }
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{slug}/favorite")]
         public async Task<IActionResult> DeleteLike(string slug)
         {
-            bool validSlug = _articleService.IsValidSlug(slug);
-            if( !validSlug ) return BadRequest(new Error()
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            var tokens = _tokenManager.ExtractClaims(token);
+            var article = _articleService.GetArticle(slug);
+            if( article == null ) return BadRequest(new Error()
             {
                 Status = "400" ,
                 Tittle = "Bad Request" ,
                 ErrorMessage = "Invalid Slug "
             });
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var SrcId = tokens.Claims.First(claim => claim.Type == "uid").Value;
+            var SrcName = tokens.Claims.First(claim => claim.Type == "uid").Value;
             var isLiked = await _likeService.DeleteLikeAsync(slug ,SrcId);
             if( isLiked == Status.Duplicate )
                 return BadRequest(new Error()
@@ -76,7 +87,16 @@ namespace RealWordBE.Controllers
                     Tittle = "Bad Request" ,
                     ErrorMessage = $"Already UnFaviourte Article "
                 });
-            return NoContent();
+
+            var articleResponseDto = await _articleService.GetAricleResponseAsync(_profileService ,article ,SrcId ,SrcName);
+            if( articleResponseDto == null )
+                return BadRequest(new Error()
+                { ErrorMessage = "Invalid Slug" ,Status = "400" ,Tittle = "BadRequest" });
+
+
+            var response = new ArticleResponseOuterDto() { Article = articleResponseDto };
+            return Ok(response);
+
 
 
 

@@ -82,9 +82,12 @@ namespace RealWordBE.Controllers
         }
 
         [HttpPost("users/logout")]
-        [Authorize]
+        //[Authorize]
         public IActionResult CancelAccessToken()
         {
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+
             _tokenManager.DeactivateCurrentAsync();
 
             return NoContent();
@@ -94,8 +97,8 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
-
             var tokens = _tokenManager.ExtractClaims(token);
+
             var email = tokens.Claims.First(claim => claim.Type == "emailaddress").Value;
             // var email2 = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
             var user = await _userReposotory.GetUserByEmailAsync(email);
@@ -123,7 +126,7 @@ namespace RealWordBE.Controllers
             _mapper.Map<UserForUpdateDto ,User>(userDto ,currentUser);
             await _userReposotory.UpdateUser(currentUser);
             //update user email or user name make  token claims become invalid ,token should be expired
-            _tokenManager.DeactivateCurrentAsync();
+            // _tokenManager.DeactivateCurrentAsync();
 
             var userResponseDto = _mapper.Map<UserResponseDto>(currentUser);
             userResponseDto.Token = null;

@@ -6,6 +6,7 @@ using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWord.DB.Services;
+using RealWordBE.Authentication.Logout;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,11 +17,13 @@ namespace RealWordBE.Controllers
     public class CommentController:ControllerBase
     {
         private readonly ICommentService _commentService;
+        private readonly ITokenManager _tokenManager;
 
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService ,ITokenManager tokenManager)
         {
 
             _commentService = commentService;
+            _tokenManager = tokenManager;
         }
         [Authorize]
         [HttpPost]
@@ -48,9 +51,15 @@ namespace RealWordBE.Controllers
         [HttpGet]
         public async Task<ActionResult<CommentsResponseOuterDto>> GetComments(string slug)
         {
-            var currentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            string CurrentUserName = null;
+            if( token != string.Empty )
+            {
+                var tokens = _tokenManager.ExtractClaims(token);
+                CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
+            }
 
-            var result = await _commentService.GetComments(slug ,currentUserName);
+            var result = await _commentService.GetComments(slug ,CurrentUserName);
             if( result == null )
             {
                 return BadRequest(new Error()
