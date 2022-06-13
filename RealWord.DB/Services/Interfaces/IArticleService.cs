@@ -12,7 +12,7 @@ namespace RealWord.DB.Services
 {
     public interface IArticleService
     {
-        Task CreateArticleWithTag(Article article ,List<Tag> tags);
+        Task<Status> CreateArticleWithTag(Article article ,List<Tag> tags);
         Task<ArticleResponseDto> GetAricleResponseAsync([FromServices] IProfileService profileService ,string slug ,String userId ,string CurrentUserName);
         Task UpdateArticle(string slug ,ArticleForUpdateDto UpdatedArticle);
         Task DeleteArticle(string slug);

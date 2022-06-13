@@ -22,17 +22,15 @@ namespace RealWordBE.Controllers
         private readonly IMapper _mapper;
         private readonly IArticleService _articleService;
         private readonly IProfileService _profileService;
-        private readonly ILikeService _likeService;
-        private readonly IFollowerRepository _followerRepository;
 
-        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService ,ILikeService likeService ,IFollowerRepository followerRepository)
+
+        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService)
         {
 
             _mapper = mapper;
             _articleService = articleService;
             _profileService = profileService;
-            _likeService = likeService;
-            _followerRepository = followerRepository;
+
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
@@ -78,7 +76,8 @@ namespace RealWordBE.Controllers
             article.UserId = UserId;
 
 
-            await _articleService.CreateArticleWithTag(article ,tags);
+            var result = await _articleService.CreateArticleWithTag(article ,tags);
+            if( result == Status.Invalid ) return BadRequest();
 
             return RedirectToRoute("GetArticle" ,new { slug = article.Slug });
 
@@ -109,6 +108,7 @@ namespace RealWordBE.Controllers
             return RedirectToRoute("GetArticle" ,new { slug = slug });
 
         }
+
         [Authorize]
         [HttpDelete("{slug}")]
         public async Task<IActionResult> DeleteArticleAsync(string slug)
@@ -129,95 +129,9 @@ namespace RealWordBE.Controllers
             return NoContent();
 
         }
-        [Authorize]
-        [HttpPost("{slug}/favorite")]
-        public async Task<IActionResult> CreateLike(string slug)
-        {
-            bool validSlug = _articleService.IsValidSlug(slug);
-            if( !validSlug ) return BadRequest(new Error()
-            {
-                Status = "400" ,
-                Tittle = "Bad Request" ,
-                ErrorMessage = "Invalid Slug "
-            });
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var isLiked = await _likeService.CreateLikeAsync(slug ,SrcId);
-            if( isLiked == Status.Duplicate )
-                return BadRequest(new Error()
-                {
-                    Status = "400" ,
-                    Tittle = "Bad Request" ,
-                    ErrorMessage = $"Already Faviourte Article "
-                });
-            return RedirectToRoute("GetArticle" ,new { slug = slug });
 
 
 
-        }
-        [Authorize]
-        [HttpDelete("{slug}/favorite")]
-        public async Task<IActionResult> DeleteLike(string slug)
-        {
-            bool validSlug = _articleService.IsValidSlug(slug);
-            if( !validSlug ) return BadRequest(new Error()
-            {
-                Status = "400" ,
-                Tittle = "Bad Request" ,
-                ErrorMessage = "Invalid Slug "
-            });
-            var SrcId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var isLiked = await _likeService.DeleteLikeAsync(slug ,SrcId);
-            if( isLiked == Status.Duplicate )
-                return BadRequest(new Error()
-                {
-                    Status = "400" ,
-                    Tittle = "Bad Request" ,
-                    ErrorMessage = $"Already UnFaviourte Article "
-                });
-            return NoContent();
-
-
-
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<ArticlesResponseOuterDto>> ListArticlesWithFilters
-                ([FromQuery] string tag ,[FromQuery] string author ,[FromQuery] string favorited ,
-                [FromQuery] int limit ,[FromQuery] int offset)
-        {
-            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
-            var articles = await _articleService.ListArticlesWithFilters(limit ,offset ,tag ,favorited ,author);
-            if( articles == null ) return BadRequest(new Error() { ErrorMessage = "Invalid input" ,Status = "400" ,Tittle = "Bad Request" });
-            List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
-            foreach( var article in articles )
-            {
-                var element = await _articleService.GetAricleResponseAsync(_profileService ,article.Slug ,CurrentUserId ,CurrentUserName);
-                articlResponseList.Add(element);
-            }
-            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
-            return Ok(result);
-
-        }
-        [Authorize]
-        [HttpGet("feed")]
-        public async Task<ActionResult<ArticlesResponseOuterDto>> FeedArticlesAsync([FromQuery] int limit ,[FromQuery] int offset)
-        {
-            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
-
-            var articles = _articleService.FeedArticles(_followerRepository ,CurrentUserId ,limit ,offset);
-            if( articles == null ) return Ok("No followed users");
-            List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
-            foreach( var article in articles )
-            {
-                var element = await _articleService.GetAricleResponseAsync(_profileService ,article.Slug ,CurrentUserId ,CurrentUserName);
-                articlResponseList.Add(element);
-            }
-            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
-            return Ok(result);
-
-        }
 
     }
 }

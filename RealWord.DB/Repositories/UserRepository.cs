@@ -101,8 +101,7 @@ namespace RealWordBE.Authentication
 
         async Task IUserRepository.UpdateUser(User currentUser)
         {
-            //newUser.Id = currentUser.Id;
-            //currentUser.Email = newUser.Email;
+
             var result = await _userManager.UpdateAsync(currentUser);
         }
     }

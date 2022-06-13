@@ -34,18 +34,27 @@ namespace RealWord.DB.Services
 
 
 
-        public async Task CreateArticleWithTag(Article article ,List<Tag> tags)
+        public async Task<Status> CreateArticleWithTag(Article article ,List<Tag> tags)
         {
-            using var transaction =
-                   await _context.Database.BeginTransactionAsync();
-            await _articleRepository.AddArticle(article);
+            try
+            {
+                using var transaction =
+                       await _context.Database.BeginTransactionAsync();
 
-            await _tagRepository.AddTags(tags);
-            await SaveChangesAsync();
+                await _articleRepository.AddArticle(article);
 
-            await _articleTagRepository.AddTagsToArticle(article.Slug ,tags);
-            await SaveChangesAsync();
-            await transaction.CommitAsync();
+                await _tagRepository.AddTags(tags);
+                await SaveChangesAsync();
+
+                await _articleTagRepository.AddTagsToArticle(article.Slug ,tags);
+                await SaveChangesAsync();
+                await transaction.CommitAsync();
+                return Status.Completed;
+            }
+            catch( Exception )
+            {
+                return Status.Invalid;
+            }
 
         }
         public async Task<ArticleResponseDto> GetAricleResponseAsync(IProfileService profileService ,string slug ,String userId ,String CurrentUserName)
