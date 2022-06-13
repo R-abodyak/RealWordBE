@@ -129,5 +129,12 @@ namespace RealWord.DB.Services
             }
             catch( Exception ) { return null; }
         }
+        public IEnumerable<Article> FeedArticles(IFollowerRepository followerRepository ,string userId ,int limit = 20 ,int offset = 0)
+        {
+            var followers = followerRepository.GetFollowers(userId);
+            var result = followerRepository.GetArticlesOfFolowers(followers ,limit = 20 ,offset = 0);
+            return result;
+
+        }
     }
 }

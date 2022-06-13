@@ -34,27 +34,32 @@ namespace RealWord.DB.Repositories
             _context.Remove(f1);
             _context.SaveChanges();
         }
-        public async Task<List<Folower>> GetFollowers(string userId)
+        public List<Folower> GetFollowers(string userId)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = _context.Users.Include(a => a.followers).Where(U => U.Id == userId).FirstOrDefault();
             return user.followers;
 
         }
 
-        public IEnumerable<Article> GetArticlesOfFolowers(List<Folower> followers ,int limit ,int offset)
+        public List<Article> GetArticlesOfFolowers(List<Folower> followers ,int limit ,int offset)
         {
 
             if( followers == null ) return null;
+            Article element;
+            List<Article> articleslist = new List<Article>();
             var articles = _context.Articles
-                .OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate"))
-                .Take(limit)
-                .Skip(offset)
-                .Where(a => a.UserId ==
-                                   followers.Select(f => f.UserId)
-                                   .Where(f => f == a.UserId).FirstOrDefault()).ToList();
+                .OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate")).ToList();
+            foreach( var f in followers )
+            {
+                element = articles.Where(a => a.UserId == f.followerId).FirstOrDefault();
+                articleslist.Add(element);
+            }
+            var result = articleslist.Skip(offset).Take(limit).ToList();
+            return result;
 
-            return articles;
+            //
+
+
         }
-
     }
 }

@@ -23,14 +23,16 @@ namespace RealWordBE.Controllers
         private readonly IArticleService _articleService;
         private readonly IProfileService _profileService;
         private readonly ILikeService _likeService;
+        private readonly IFollowerRepository _followerRepository;
 
-        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService ,ILikeService likeService)
+        public ArticleController(IMapper mapper ,IArticleService articleService ,IProfileService profileService ,ILikeService likeService ,IFollowerRepository followerRepository)
         {
 
             _mapper = mapper;
             _articleService = articleService;
             _profileService = profileService;
             _likeService = likeService;
+            _followerRepository = followerRepository;
         }
 
         [HttpGet("{slug}" ,Name = "GetArticle")]
@@ -84,6 +86,7 @@ namespace RealWordBE.Controllers
 
 
         }
+
         [Authorize]
         [HttpPut("{slug}")]
         public async Task<IActionResult> UpdateArticleAsync(ArticleForUpdateOuterDto articleOuterDto ,string slug)
@@ -176,10 +179,11 @@ namespace RealWordBE.Controllers
 
 
         }
+
         [HttpGet]
         public async Task<ActionResult<ArticlesResponseOuterDto>> ListArticlesWithFilters
-            ([FromQuery] string tag ,[FromQuery] string author ,[FromQuery] string favorited ,
-            [FromQuery] int limit ,[FromQuery] int offset)
+                ([FromQuery] string tag ,[FromQuery] string author ,[FromQuery] string favorited ,
+                [FromQuery] int limit ,[FromQuery] int offset)
         {
             var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
@@ -195,5 +199,25 @@ namespace RealWordBE.Controllers
             return Ok(result);
 
         }
+        [Authorize]
+        [HttpGet("feed")]
+        public async Task<ActionResult<ArticlesResponseOuterDto>> FeedArticlesAsync([FromQuery] int limit ,[FromQuery] int offset)
+        {
+            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+
+            var articles = _articleService.FeedArticles(_followerRepository ,CurrentUserId ,limit ,offset);
+            if( articles == null ) return Ok("No followed users");
+            List<ArticleResponseDto> articlResponseList = new List<ArticleResponseDto>();
+            foreach( var article in articles )
+            {
+                var element = await _articleService.GetAricleResponseAsync(_profileService ,article.Slug ,CurrentUserId ,CurrentUserName);
+                articlResponseList.Add(element);
+            }
+            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
+            return Ok(result);
+
+        }
+
     }
 }
