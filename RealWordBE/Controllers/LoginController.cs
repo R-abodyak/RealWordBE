@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
 using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
@@ -71,7 +72,7 @@ namespace RealWordBE.Controllers
             }
             else
             {
-                var token = await _userReposotory.CreateJwtToken(userEntity);
+                var token = await _tokenManager.CreateJwtToken(userEntity);
                 var response = _mapper.Map<UserResponseDto>(userEntity);
                 response.Token = token;
                 var outerResponse = new UserResponseOuterDto() { User = response };
@@ -89,24 +90,32 @@ namespace RealWordBE.Controllers
             return NoContent();
         }
         [HttpGet("user")]
-        [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+
+            var tokens = _tokenManager.ExtractClaims(token);
+            var email = tokens.Claims.First(claim => claim.Type == "emailaddress").Value;
+            // var email2 = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
             var user = await _userReposotory.GetUserByEmailAsync(email);
             var userResponseDto = _mapper.Map<UserResponseDto>(user);
-            var token = _tokenManager.GetCurrentTokenAsync();
-            if( token == null ) return Unauthorized();
+
             userResponseDto.Token = token;
             var outerResponse = new UserResponseOuterDto() { User = userResponseDto };
             return Ok(outerResponse);
 
         }
         [HttpPut("user")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> UpdateCurrentUser(UserForUpdateOuterDto userForUpdateOuter)
         {
-            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+
+            var tokens = _tokenManager.ExtractClaims(token);
+            var email = tokens.Claims.First(claim => claim.Type == "emailaddress").Value;
+            // var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
             var currentUser = await _userReposotory.GetUserByEmailAsync(email);
             if( currentUser == null ) return Unauthorized();
 
