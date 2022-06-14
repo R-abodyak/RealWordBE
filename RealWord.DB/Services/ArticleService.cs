@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RealWord.DB.Entities;
+using RealWord.DB.Extension;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
@@ -62,8 +63,8 @@ namespace RealWord.DB.Services
             if( articleDB == null || articleDB.Slug == null ) return null;
             var articleResponseDto = _mapper.Map<ArticleResponseDto>(articleDB);
 
-            articleResponseDto.CreatedDate = _articleRepository.GetCreatedDate(articleDB.Slug);
-            articleResponseDto.UpdatedDate = _articleRepository.GetUpdatedDate(articleDB.Slug);
+            articleResponseDto.CreatedDate = _articleRepository.GetCreatedDate(articleDB.Slug).ToUniversalIso8601();
+            articleResponseDto.UpdatedDate = _articleRepository.GetUpdatedDate(articleDB.Slug).ToUniversalIso8601();
             articleResponseDto.Favorited = _likeRepository.IsArticleLikedByUser(articleDB.ArticleId ,userId);
             articleResponseDto.FavoritesCount = _likeRepository.CountLikes(articleDB.ArticleId ,userId);
             var Tags = _articleTagRepository.GetTagsOfArticle(articleDB.Slug);
@@ -112,7 +113,7 @@ namespace RealWord.DB.Services
         }
 
 
-        async Task<IEnumerable<Article>> IArticleService.ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author)
+        public async Task<IEnumerable<Article>> ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author)
         {
             try
             {
@@ -135,6 +136,7 @@ namespace RealWord.DB.Services
                 return result;
             }
             catch( Exception ) { return null; }
+
         }
         public IEnumerable<Article> FeedArticles(IFollowerRepository followerRepository ,string userId ,int limit = 20 ,int offset = 0)
         {

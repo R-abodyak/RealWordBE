@@ -64,12 +64,17 @@ namespace RealWordBE.Controllers
             return Ok(result);
 
         }
-        [Authorize]
         [HttpGet("feed")]
         public async Task<ActionResult<ArticlesResponseOuterDto>> FeedArticlesAsync([FromQuery] int limit ,[FromQuery] int offset)
         {
-            var CurrentUserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var CurrentUserName = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
+
+            var tokens = _tokenManager.ExtractClaims(token);
+            var CurrentUserId = tokens.Claims.First(claim => claim.Type == "uid").Value;
+            var CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
+
 
             var articles = _articleService.FeedArticles(_followerRepository ,CurrentUserId ,limit ,offset);
             if( articles == null ) return Ok("No followed users");

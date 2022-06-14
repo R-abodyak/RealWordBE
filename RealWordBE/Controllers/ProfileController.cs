@@ -87,7 +87,7 @@ namespace RealWordBE.Controllers
 
 
             var profile = new ProfileResponseDto();
-            profile.UserName = username;
+            profile.Username = username;
 
             return RedirectToRoute("Profile" ,new { username = username });
 
@@ -127,7 +127,7 @@ namespace RealWordBE.Controllers
 
 
             var profile = new ProfileResponseDto();
-            profile.UserName = username;
+            profile.Username = username;
 
             return RedirectToRoute("Profile" ,new { username = username });
 

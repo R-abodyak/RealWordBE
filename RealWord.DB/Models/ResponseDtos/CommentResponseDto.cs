@@ -7,6 +7,8 @@ namespace RealWord.DB.Models.ResponseDtos
 {
     public class CommentResponseDto
     {
+        [JsonPropertyName("id")]
+
         public int CommentId { get; set; }
 
         [JsonPropertyName("createdAt")]

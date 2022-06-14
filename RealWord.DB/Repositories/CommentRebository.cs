@@ -1,4 +1,5 @@
-﻿using RealWord.DB.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using RealWord.DB.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,8 @@ namespace RealWord.DB.Repositories
 
         public IEnumerable<Comment> GetComments(String slug)
         {
-            var article = _context.Articles.Where(a => a.Slug == slug).FirstOrDefault();
+            var article = _context.Articles.Include(c => c.Comments).
+                Where(a => a.Slug == slug).FirstOrDefault();
             if( article == null ) return null;
             var comments = _context.Comments.Select(c => c).Where(a => a.Article == article).ToList();
             return comments;

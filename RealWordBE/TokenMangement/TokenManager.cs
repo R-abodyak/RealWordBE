@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using RealWord.DB.Entities;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
+using System.Security.Principal;
 
 namespace RealWordBE.Authentication.Logout
 {
@@ -83,13 +84,7 @@ namespace RealWordBE.Authentication.Logout
         private static string GetKey(string token)
             => $"tokens:{token}:deactivated";
 
-        public JwtSecurityToken ExtractClaims(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token);
-            var tokenS = jsonToken as JwtSecurityToken;
-            return tokenS;
-        }
+
         public async Task<string> CreateJwtToken(User user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -113,6 +108,41 @@ namespace RealWordBE.Authentication.Logout
             return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
         }
+
+        public bool ValidateToken(string authToken)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var validationParameters = GetValidationParameters();
+
+                SecurityToken validatedToken;
+                IPrincipal principal = tokenHandler.ValidateToken(authToken ,validationParameters ,out validatedToken);
+                return true;
+            }
+            catch( Exception ex ) { return false; }
+        }
+        private TokenValidationParameters GetValidationParameters()
+        {
+            return new TokenValidationParameters()
+            {
+                ValidateLifetime = true ,
+                ValidateAudience = true ,
+                ValidateIssuer = true ,
+                ValidIssuer = _jwt.Issuer ,
+                ValidAudience = _jwt.Audience ,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key)) // The same key as the one that generate the token
+            };
+        }
+        public JwtSecurityToken ExtractClaims(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token);
+            var tokenS = jsonToken as JwtSecurityToken;
+            return tokenS;
+        }
+
+
     }
 
 }

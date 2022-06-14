@@ -115,7 +115,7 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
-
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
             var tokens = _tokenManager.ExtractClaims(token);
             var email = tokens.Claims.First(claim => claim.Type == "emailaddress").Value;
             // var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;

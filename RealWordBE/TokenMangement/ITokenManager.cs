@@ -12,6 +12,7 @@ namespace RealWordBE.Authentication.Logout
         bool IsCurrentActiveToken();
         public string GetCurrentTokenAsync();
         Task<string> CreateJwtToken(User user);
+        bool ValidateToken(string authToken);
         JwtSecurityToken ExtractClaims(string token);
     }
 }
