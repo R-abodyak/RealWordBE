@@ -120,7 +120,7 @@ namespace RealWordBE.Authentication.Logout
                 IPrincipal principal = tokenHandler.ValidateToken(authToken ,validationParameters ,out validatedToken);
                 return true;
             }
-            catch( Exception ex ) { return false; }
+            catch( Exception ) { return false; }
         }
         private TokenValidationParameters GetValidationParameters()
         {

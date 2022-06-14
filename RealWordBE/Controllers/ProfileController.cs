@@ -32,7 +32,8 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             string CurrentUserName = null;
-            if( token != string.Empty )
+
+            if( token != string.Empty && _tokenManager.ValidateToken(token) )
             {
                 var tokens = _tokenManager.ExtractClaims(token);
                 CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
@@ -58,6 +59,8 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
+
             var tokens = _tokenManager.ExtractClaims(token);
 
             var SrcUserName = tokens.Claims.First(claim => claim.Type == "username").Value;

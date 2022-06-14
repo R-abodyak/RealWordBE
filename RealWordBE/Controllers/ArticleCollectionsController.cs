@@ -58,9 +58,19 @@ namespace RealWordBE.Controllers
             foreach( var article in articles )
             {
                 var element = await _articleService.GetAricleResponseAsync(_profileService ,article ,CurrentUserId ,CurrentUserName);
+
                 articlResponseList.Add(element);
             }
-            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
+            //if sorted by tag , tag should appear first
+            if( tag != null )
+                foreach( var elemnt in articlResponseList )
+                {
+                    elemnt.TagList.Remove(tag);
+                    elemnt.TagList.Insert(0 ,tag);
+                }
+
+            int count = articlResponseList.Count;
+            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList ,ArticlesCount = count };
             return Ok(result);
 
         }
@@ -84,7 +94,8 @@ namespace RealWordBE.Controllers
                 var element = await _articleService.GetAricleResponseAsync(_profileService ,article ,CurrentUserId ,CurrentUserName);
                 articlResponseList.Add(element);
             }
-            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList };
+            int count = articlResponseList.Count;
+            var result = new ArticlesResponseOuterDto() { Articles = articlResponseList ,ArticlesCount = count };
             return Ok(result);
 
         }

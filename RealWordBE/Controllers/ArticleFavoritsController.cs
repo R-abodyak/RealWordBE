@@ -40,6 +40,7 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
             var tokens = _tokenManager.ExtractClaims(token);
 
             var article = _articleService.GetArticle(slug);
@@ -69,6 +70,8 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
+
             var tokens = _tokenManager.ExtractClaims(token);
             var article = _articleService.GetArticle(slug);
             if( article == null ) return BadRequest(new Error()

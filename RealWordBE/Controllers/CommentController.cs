@@ -32,6 +32,8 @@ namespace RealWordBE.Controllers
             var commentDto = commentOuterDto.CommentDto;
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
+
             var tokens = _tokenManager.ExtractClaims(token);
 
             var CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
@@ -85,6 +87,8 @@ namespace RealWordBE.Controllers
         {
             var token = _tokenManager.GetCurrentTokenAsync();
             if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
+
             var tokens = _tokenManager.ExtractClaims(token);
 
             var CurrentUserName = tokens.Claims.First(claim => claim.Type == "username").Value;
