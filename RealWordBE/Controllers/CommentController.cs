@@ -102,7 +102,7 @@ namespace RealWordBE.Controllers
             if( isAuthor == false )
                 return Forbid("permission denied ,users cant delete others comments");
 
-            var comments = await _commentService.GetComments(slug ,currentUserName);
+            var comments = await _commentService.GetComments(slug ,CurrentUserName);
             if( comments == null )
                 return BadRequest(new Error()
                 {
