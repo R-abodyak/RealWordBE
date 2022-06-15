@@ -27,6 +27,8 @@
 		<Compile Remove="Migrations\20220611193245_identity_likeAndCommentTables.Designer.cs" />
 		<Compile Remove="Migrations\20220611194347_drop_table_comment.cs" />
 		<Compile Remove="Migrations\20220611194347_drop_table_comment.Designer.cs" />
+		<Compile Remove="Migrations\20220611195047_creation_identity.cs" />
+		<Compile Remove="Migrations\20220611195047_creation_identity.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
