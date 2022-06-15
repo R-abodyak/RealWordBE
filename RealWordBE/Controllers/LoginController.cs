@@ -39,7 +39,7 @@ namespace RealWordBE.Controllers
         {
             var userDto = model.registerDto;
             var user = _mapper.Map<User>(userDto);
-            var result = await _userReposotory.RegisterAsync(user);
+            var result = await _userReposotory.RegisterAsync(user ,userDto.Password);
             if( result == "Success" )
             {
                 var response = _mapper.Map<UserResponseDto>(user);

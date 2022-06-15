@@ -45,13 +45,13 @@ namespace RealWordBE.Authentication
         }
 
 
-        public async Task<string> RegisterAsync(User user)
+        public async Task<string> RegisterAsync(User user ,string password)
         {
             var X = user;
             var userWithSameEmail = await _userManager.FindByEmailAsync(user.Email);
             if( userWithSameEmail == null )
             {
-                var result = await _userManager.CreateAsync(user ,user.Password);
+                var result = await _userManager.CreateAsync(user ,password);
                 if( result.Succeeded )
                 {
 
