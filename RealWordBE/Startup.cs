@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using RealWord.DB;
 using RealWord.DB.Entities;
 using RealWord.DB.Repositories;
+using RealWord.DB.Services;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
 using System;
@@ -39,10 +40,32 @@ namespace RealWordBE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ILikeRepository ,LikeRepository>();
+            services.AddScoped<ITagRepository ,TagRepository>();
+            services.AddScoped<ICommentRebository ,CommentRebository>();
+
             services.AddScoped<IFollowerRepository ,FollowerRepository>();
+            services.AddScoped<IArticleRebository ,ArticleRebository>();
+            services.AddScoped<IArticleTagRebository ,ArticleTagRebository>();
+
+            services.AddScoped<IArticleService ,ArticleService>();
+            services.AddScoped<IProfileService ,ProfileService>();
+            services.AddScoped<ICommentService ,CommentService>();
+            services.AddScoped<ILikeService ,LikeService>();
+            services.AddScoped<ITagService ,TagService>();
+
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //{
+            //    options.UseInMemoryDatabase("postman_test_inmeomry");
+            //});
+
+
+
             services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(
-                   Configuration.GetConnectionString("RealWorldDB")));
+                   Configuration.GetConnectionString("RealWorldDB"))
+
+               );
             services.Configure<JWT>(Configuration.GetSection("JWT"));
             //User Manager Service
             services.AddIdentity<User ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();

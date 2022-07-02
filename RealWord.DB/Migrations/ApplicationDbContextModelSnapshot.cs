@@ -152,10 +152,13 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("RealWord.DB.Entities.Article", b =>
                 {
-                    b.Property<int>("ArticlId")
+                    b.Property<int>("ArticleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -167,12 +170,18 @@ namespace RealWord.DB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ArticlId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ArticleId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Articles");
                 });
@@ -194,10 +203,12 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("RealWord.DB.Entities.Comment", b =>
                 {
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("User_id")
+                    b.Property<int>("ArticleId")
                         .HasColumnType("int");
 
                     b.Property<string>("CommentMsg")
@@ -209,12 +220,14 @@ namespace RealWord.DB.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("User_id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ArticleId", "User_id");
+                    b.HasKey("CommentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("User_id");
 
                     b.ToTable("Comments");
                 });
@@ -236,21 +249,25 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("RealWord.DB.Entities.Like", b =>
                 {
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
+                    b.Property<int>("LikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("User_id")
+                    b.Property<int>("ArticleId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("User_id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ArticleId", "User_id");
+                    b.HasKey("LikeId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("User_id");
 
                     b.ToTable("Likes");
                 });
@@ -308,9 +325,6 @@ namespace RealWord.DB.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -395,6 +409,13 @@ namespace RealWord.DB.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RealWord.DB.Entities.Article", b =>
+                {
+                    b.HasOne("RealWord.DB.Entities.User", "User")
+                        .WithMany("Articles")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("RealWord.DB.Entities.ArticleTag", b =>
                 {
                     b.HasOne("RealWord.DB.Entities.Article", "Article")
@@ -413,14 +434,14 @@ namespace RealWord.DB.Migrations
             modelBuilder.Entity("RealWord.DB.Entities.Comment", b =>
                 {
                     b.HasOne("RealWord.DB.Entities.Article", "Article")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RealWord.DB.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("Comments")
+                        .HasForeignKey("User_id");
                 });
 
             modelBuilder.Entity("RealWord.DB.Entities.Folower", b =>
@@ -441,14 +462,14 @@ namespace RealWord.DB.Migrations
             modelBuilder.Entity("RealWord.DB.Entities.Like", b =>
                 {
                     b.HasOne("RealWord.DB.Entities.Article", "Article")
-                        .WithMany()
+                        .WithMany("Likes")
                         .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RealWord.DB.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("Likes")
+                        .HasForeignKey("User_id");
                 });
 #pragma warning restore 612, 618
         }
