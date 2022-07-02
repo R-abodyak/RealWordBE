@@ -1,12 +1,20 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using RealWord.DB.Entities;
 using RealWord.DB.Models;
 using RealWord.DB.Models.Request_Dtos.Outer_Dtos;
+using RealWord.DB.Models.RequestDtos;
+using RealWord.DB.Models.RequestDtos.OuterDtos;
 using RealWord.DB.Models.Response_Dtos;
+using RealWord.DB.Models.ResponseDtos.OuterResponseDto;
 using RealWordBE.Authentication;
 using RealWordBE.Authentication.Logout;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RealWordBE.Controllers
@@ -15,14 +23,14 @@ namespace RealWordBE.Controllers
     [ApiController]
     public class LoginController:ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserRepository _userReposotory;
         private readonly IMapper _mapper;
         private readonly ITokenManager _tokenManager;
 
 
-        public LoginController(IUserService userService ,IMapper mapper ,ITokenManager tokenManager)
+        public LoginController(IUserRepository userRepository ,IMapper mapper ,ITokenManager tokenManager)
         {
-            _userService = userService;
+            _userReposotory = userRepository;
             _mapper = mapper;
             _tokenManager = tokenManager;
         }
@@ -31,12 +39,12 @@ namespace RealWordBE.Controllers
         {
             var userDto = model.registerDto;
             var user = _mapper.Map<User>(userDto);
-            var result = await _userService.RegisterAsync(user);
+            var result = await _userReposotory.RegisterAsync(user ,userDto.Password);
             if( result == "Success" )
             {
                 var response = _mapper.Map<UserResponseDto>(user);
-                //TO DO  redirect to get 
-                return Ok(response);
+                var outerResponse = new UserResponseOuterDto() { User = response };
+                return Ok(outerResponse);
             }
             else
                 return BadRequest(new Error
@@ -51,7 +59,7 @@ namespace RealWordBE.Controllers
         {
             var userDto = model.LoginDto;
 
-            var userEntity = await _userService.AuthenticateUser(userDto.Email ,userDto.Password);
+            var userEntity = await _userReposotory.AuthenticateUser(userDto.Email ,userDto.Password);
 
             if( userEntity == null )
             {
@@ -64,21 +72,68 @@ namespace RealWordBE.Controllers
             }
             else
             {
-                var token = await _userService.CreateJwtToken(userEntity);
-                var respone = _mapper.Map<UserResponseDto>(userEntity);
-                respone.Token = token;
-                return Ok(respone);
+                var token = await _tokenManager.CreateJwtToken(userEntity);
+                var response = _mapper.Map<UserResponseDto>(userEntity);
+                response.Token = token;
+                var outerResponse = new UserResponseOuterDto() { User = response };
+                return Ok(outerResponse);
             }
 
         }
 
         [HttpPost("users/logout")]
-        [Authorize]
+        //[Authorize]
         public IActionResult CancelAccessToken()
         {
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+
             _tokenManager.DeactivateCurrentAsync();
 
             return NoContent();
+        }
+        [HttpGet("user")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            var tokens = _tokenManager.ExtractClaims(token);
+
+            var email = tokens.Claims.First(claim => claim.Type == "emailaddress").Value;
+            // var email2 = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
+            var user = await _userReposotory.GetUserByEmailAsync(email);
+            var userResponseDto = _mapper.Map<UserResponseDto>(user);
+
+            userResponseDto.Token = token;
+            var outerResponse = new UserResponseOuterDto() { User = userResponseDto };
+            return Ok(outerResponse);
+
+        }
+        [HttpPut("user")]
+        //[Authorize]
+        public async Task<IActionResult> UpdateCurrentUser(UserForUpdateOuterDto userForUpdateOuter)
+        {
+            var token = _tokenManager.GetCurrentTokenAsync();
+            if( token == string.Empty ) return Unauthorized();
+            if( !_tokenManager.ValidateToken(token) ) return Unauthorized();
+            var tokens = _tokenManager.ExtractClaims(token);
+            var email = tokens.Claims.First(claim => claim.Type == "emailaddress").Value;
+            // var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "emailaddress")?.Value;
+            var currentUser = await _userReposotory.GetUserByEmailAsync(email);
+            if( currentUser == null ) return Unauthorized();
+
+            var userDto = userForUpdateOuter.userForUpdateDto;
+            _mapper.Map<UserForUpdateDto ,User>(userDto ,currentUser);
+            await _userReposotory.UpdateUser(currentUser);
+            //update user email or user name make  token claims become invalid ,token should be expired
+            // _tokenManager.DeactivateCurrentAsync();
+
+            var userResponseDto = _mapper.Map<UserResponseDto>(currentUser);
+            userResponseDto.Token = null;
+            var outerResponse = new UserResponseOuterDto() { User = userResponseDto };
+            return Ok(outerResponse);
+
+
         }
 
     }
