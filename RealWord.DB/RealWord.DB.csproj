@@ -11,6 +11,24 @@
 		<Compile Remove="Migrations\20220607063429_DBSchema.Designer.cs" />
 		<Compile Remove="Migrations\20220607071638_DBSchema.cs" />
 		<Compile Remove="Migrations\20220607071638_DBSchema.Designer.cs" />
+		<Compile Remove="Migrations\20220609101323_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609101323_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609101839_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609101839_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609103143_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609103143_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609103602_Article_User_Relation.cs" />
+		<Compile Remove="Migrations\20220609103602_Article_User_Relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.cs" />
+		<Compile Remove="Migrations\20220609190745_Like_relation_and_comment_relation.Designer.cs" />
+		<Compile Remove="Migrations\20220609192222_Like_relation_and_comment_relation_Keys.cs" />
+		<Compile Remove="Migrations\20220609192222_Like_relation_and_comment_relation_Keys.Designer.cs" />
+		<Compile Remove="Migrations\20220611193245_identity_likeAndCommentTables.cs" />
+		<Compile Remove="Migrations\20220611193245_identity_likeAndCommentTables.Designer.cs" />
+		<Compile Remove="Migrations\20220611194347_drop_table_comment.cs" />
+		<Compile Remove="Migrations\20220611194347_drop_table_comment.Designer.cs" />
+		<Compile Remove="Migrations\20220611195047_creation_identity.cs" />
+		<Compile Remove="Migrations\20220611195047_creation_identity.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -20,18 +38,27 @@
 
 
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.1" />
+
+
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Net.Http.Headers" Version="2.0.1" />
 		<PackageReference Include="System.Collections" Version="4.3.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.18.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="NewFolder1\" />
 	</ItemGroup>
 
 </Project>
