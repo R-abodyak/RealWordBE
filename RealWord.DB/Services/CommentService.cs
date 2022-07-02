@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RealWord.DB;
 using RealWord.DB.Entities;
+using RealWord.DB.Extension;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
@@ -74,8 +75,10 @@ namespace RealWord.DB.Services
         private async Task<CommentResponseDto> GenerateCommentRespnseDto(int id ,string slug ,string CurrentUserName ,Comment comment)
         {
             var commentResponse = _mapper.Map<CommentResponseDto>(comment);
-            commentResponse.UpdatedDate = await _commentRebository.GetUpdatedDateAsync(id);
-            commentResponse.CreatedDate = await _commentRebository.GetCreatedDate(id);
+            DateTime updateDataTime = await _commentRebository.GetUpdatedDateAsync(id);
+            DateTime createDataTime = await _commentRebository.GetCreatedDate(id);
+            commentResponse.UpdatedDate = updateDataTime.ToUniversalIso8601();
+            commentResponse.CreatedDate = createDataTime.ToUniversalIso8601();
             var author = _articleRepository.GetAuthorofArticle(slug);
 
             commentResponse.Author =

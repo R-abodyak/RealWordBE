@@ -28,6 +28,11 @@ namespace RealWord.DB.Repositories
             return await _context.Tags.ToListAsync();
 
         }
+        public Task<Tag> GetTagByName(string name)
+        {
+
+            return _context.Tags.Where(t => t.Name == name).FirstOrDefaultAsync();
+        }
 
 
     }
