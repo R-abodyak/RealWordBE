@@ -52,13 +52,20 @@ namespace RealWordBE
             services.AddScoped<IProfileService ,ProfileService>();
             services.AddScoped<ICommentService ,CommentService>();
             services.AddScoped<ILikeService ,LikeService>();
+            services.AddScoped<ITagService ,TagService>();
 
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //{
+            //    options.UseInMemoryDatabase("postman_test_inmeomry");
+            //});
 
 
 
             services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(
-                   Configuration.GetConnectionString("RealWorldDB")));
+                   Configuration.GetConnectionString("RealWorldDB"))
+
+               );
             services.Configure<JWT>(Configuration.GetSection("JWT"));
             //User Manager Service
             services.AddIdentity<User ,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();

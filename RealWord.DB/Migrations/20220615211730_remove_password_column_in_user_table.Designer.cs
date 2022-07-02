@@ -10,8 +10,8 @@ using RealWord.DB;
 namespace RealWord.DB.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220611195047_creation_identity")]
-    partial class creation_identity
+    [Migration("20220615211730_remove_password_column_in_user_table")]
+    partial class remove_password_column_in_user_table
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -327,9 +327,6 @@ namespace RealWord.DB.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");

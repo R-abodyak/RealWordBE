@@ -13,7 +13,7 @@ namespace RealWord.DB.Repositories
         DateTime GetUpdatedDate(string articleSlug);
         User GetAuthorofArticle(String slug);
         void DeleteArticle(Article article);
-
+        IEnumerable<Article> ListArticlesWithFilters(int limit ,int offset ,int tagId ,string favoritedUserId ,string authorId);
 
         Task SaveChangesAsync();
 
