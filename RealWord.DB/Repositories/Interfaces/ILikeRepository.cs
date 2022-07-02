@@ -8,5 +8,8 @@ namespace RealWord.DB.Repositories
     {
         bool IsArticleLikedByUser(int ArticleId ,string UserId);
         int CountLikes(int ArticleId ,string UserId);
+
+        void CreateLike(int ArticleId ,string UserId);
+        void DeleteLike(int ArticleId ,string UserId);
     }
 }

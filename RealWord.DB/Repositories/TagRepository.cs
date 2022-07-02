@@ -1,4 +1,5 @@
-﻿using RealWord.DB.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using RealWord.DB.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,17 @@ namespace RealWord.DB.Repositories
             }
 
         }
+        public async Task<List<Tag>> GetAllTagsAsync()
+        {
+            return await _context.Tags.ToListAsync();
+
+        }
+        public Task<Tag> GetTagByName(string name)
+        {
+
+            return _context.Tags.Where(t => t.Name == name).FirstOrDefaultAsync();
+        }
+
 
     }
 }
