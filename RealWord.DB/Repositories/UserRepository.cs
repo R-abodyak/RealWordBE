@@ -17,11 +17,10 @@ namespace RealWordBE.Authentication
     public class UserRepository:IUserRepository
     {
         private readonly UserManager<User> _userManager;
-        private readonly JWT _jwt;
         public UserRepository(UserManager<User> userManager ,IOptions<JWT> jwt)
         {
             _userManager = userManager;
-            _jwt = jwt.Value;
+
         }
 
         public async Task<User> AuthenticateUser(string email ,string password)
@@ -45,36 +44,14 @@ namespace RealWordBE.Authentication
 
         }
 
-        public async Task<string> CreateJwtToken(User user)
-        {
-            var userClaims = await _userManager.GetClaimsAsync(user);
 
-            var claims = new[]
-            {
-                new Claim("username", user.UserName),
-                new Claim("emailaddress", user.Email),
-                new Claim("uid", user.Id)
-            }
-            .Union(userClaims);
-
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey ,SecurityAlgorithms.HmacSha256);
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: _jwt.Issuer ,
-                audience: _jwt.Audience ,
-                claims: claims ,
-                expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes) ,
-                signingCredentials: signingCredentials);
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
-        }
-        public async Task<string> RegisterAsync(User user)
+        public async Task<string> RegisterAsync(User user ,string password)
         {
             var X = user;
             var userWithSameEmail = await _userManager.FindByEmailAsync(user.Email);
             if( userWithSameEmail == null )
             {
-                var result = await _userManager.CreateAsync(user ,user.Password);
+                var result = await _userManager.CreateAsync(user ,password);
                 if( result.Succeeded )
                 {
 
@@ -101,8 +78,7 @@ namespace RealWordBE.Authentication
 
         async Task IUserRepository.UpdateUser(User currentUser)
         {
-            //newUser.Id = currentUser.Id;
-            //currentUser.Email = newUser.Email;
+
             var result = await _userManager.UpdateAsync(currentUser);
         }
     }

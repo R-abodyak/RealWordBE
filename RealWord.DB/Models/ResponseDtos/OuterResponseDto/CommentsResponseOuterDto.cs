@@ -6,6 +6,6 @@ namespace RealWord.DB.Models.ResponseDtos.OuterResponseDto
 {
     public class CommentsResponseOuterDto
     {
-        public IEnumerable<CommentResponseDto> Comments;
+        public IEnumerable<CommentResponseDto> Comments { get; set; }
     }
 }
