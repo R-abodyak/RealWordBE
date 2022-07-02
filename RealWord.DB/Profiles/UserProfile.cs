@@ -21,7 +21,7 @@ namespace RealWord.DB.Profiles
             //for update with  Null values .if value is Null then don't map it 
             CreateMap<UserForUpdateDto ,User>().ForAllMembers(x => x.Condition(
                       (src ,dest ,sourceValue) => sourceValue != null));
-            //}
+
         }
     }
 }
