@@ -12,6 +12,7 @@ namespace RealWord.DB.Models
         [JsonPropertyName("username")]
         public string UserName { get; set; }
         [Required]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
         [JsonPropertyName("email")]
         public string Email { get; set; }
         [Required]
