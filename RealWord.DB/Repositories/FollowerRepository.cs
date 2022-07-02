@@ -45,7 +45,7 @@ namespace RealWord.DB.Repositories
         {
 
             if( followers == null ) return null;
-            Article element;
+
             List<Article> articleslist = new List<Article>();
             var articles = _context.Articles
                 .OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate")).ToList();

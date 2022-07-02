@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RealWord.DB.Entities;
+using RealWord.DB.Extension;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
@@ -34,10 +35,12 @@ namespace RealWord.DB.Services
 
 
 
-        public async Task CreateArticleWithTag(Article article ,List<Tag> tags)
+        public async Task<Status> CreateArticleWithTag(Article article ,List<Tag> tags)
         {
+
             using var transaction =
                    await _context.Database.BeginTransactionAsync();
+
             await _articleRepository.AddArticle(article);
 
             await _tagRepository.AddTags(tags);
@@ -46,23 +49,29 @@ namespace RealWord.DB.Services
             await _articleTagRepository.AddTagsToArticle(article.Slug ,tags);
             await SaveChangesAsync();
             await transaction.CommitAsync();
+            return Status.Completed;
+
+            //catch( Exception )
+            //{
+            //    return Status.Invalid;
+            //}
 
         }
-        public async Task<ArticleResponseDto> GetAricleResponseAsync(IProfileService profileService ,string slug ,String userId ,String CurrentUserName)
+        public async Task<ArticleResponseDto> GetAricleResponseAsync(IProfileService profileService ,Article articleDB ,String userId ,String CurrentUserName)
         {
-            var articleDB = _articleRepository.GetArticleBySlug(slug);
-            if( articleDB == null ) return null;
+
+            if( articleDB == null || articleDB.Slug == null ) return null;
             var articleResponseDto = _mapper.Map<ArticleResponseDto>(articleDB);
 
-            articleResponseDto.CreatedDate = _articleRepository.GetCreatedDate(articleDB.Slug);
-            articleResponseDto.UpdatedDate = _articleRepository.GetUpdatedDate(articleDB.Slug);
+            articleResponseDto.CreatedDate = _articleRepository.GetCreatedDate(articleDB.Slug).ToUniversalIso8601();
+            articleResponseDto.UpdatedDate = _articleRepository.GetUpdatedDate(articleDB.Slug).ToUniversalIso8601();
             articleResponseDto.Favorited = _likeRepository.IsArticleLikedByUser(articleDB.ArticleId ,userId);
             articleResponseDto.FavoritesCount = _likeRepository.CountLikes(articleDB.ArticleId ,userId);
-            var Tags = _articleTagRepository.GetTagsOfArticle(slug);
+            var Tags = _articleTagRepository.GetTagsOfArticle(articleDB.Slug);
             List<string> tagsNames = new List<string>();
             foreach( var tag in Tags ) { tagsNames.Add(tag.Name); }
             articleResponseDto.TagList = tagsNames;
-            var AuthoruserName = _articleRepository.GetAuthorofArticle(slug).UserName;
+            var AuthoruserName = _articleRepository.GetAuthorofArticle(articleDB.Slug).UserName;
             articleResponseDto.Author = await profileService.GetProfileAsync(CurrentUserName ,AuthoruserName);
 
 
@@ -95,28 +104,27 @@ namespace RealWord.DB.Services
             if( Author == null ) return false;
             return Author.Id == currentUserId ? true : false;
         }
-        public bool IsValidSlug(string slug)
+        public Article GetArticle(string slug)
         {
 
             var articleDB = _articleRepository.GetArticleBySlug(slug);
-            if( articleDB == null ) return false;
-            return true;
+            return articleDB;
 
         }
 
 
-        async Task<IEnumerable<Article>> IArticleService.ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author)
+        public async Task<IEnumerable<Article>> ListArticlesWithFilters(int limit ,int offset ,string tag ,string favorited ,string author)
         {
             try
             {
                 Tag tag1;
                 if( limit == 0 ) limit = 20;
                 int tagId = 0; User Author, favoritedUser; string favoritedUserId = null; string authorId = null;
-                if( tag != null ) { tag1 = await _tagRepository.GetTagByName(tag); tagId = tag1.TagId; }
+                if( tag != null ) { tag1 = await _tagRepository.GetTagByName(tag); if( tag1 != null ) tagId = tag1.TagId; }
                 if( author != null )
                 {
                     Author = await _userRepository.GetUserByUsernameAsync(author);
-                    authorId = Author.Id;
+                    if( Author != null ) authorId = Author.Id;
                 }
                 if( favorited != null )
                 {
@@ -128,6 +136,7 @@ namespace RealWord.DB.Services
                 return result;
             }
             catch( Exception ) { return null; }
+
         }
         public IEnumerable<Article> FeedArticles(IFollowerRepository followerRepository ,string userId ,int limit = 20 ,int offset = 0)
         {

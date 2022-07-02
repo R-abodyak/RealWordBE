@@ -7,13 +7,15 @@ namespace RealWord.DB.Models.ResponseDtos
 {
     public class CommentResponseDto
     {
+        [JsonPropertyName("id")]
+
         public int CommentId { get; set; }
 
         [JsonPropertyName("createdAt")]
-        public DateTime CreatedDate { get; set; }
+        public string CreatedDate { get; set; }
 
         [JsonPropertyName("updatedAt")]
-        public DateTime UpdatedDate { get; set; }
+        public string UpdatedDate { get; set; }
 
         [JsonPropertyName("body")]
 
