@@ -43,6 +43,15 @@ namespace RealWord.DB
            .HasOne(f => f.Article)
            .WithMany(f => f.Likes)
            .HasForeignKey(f => f.ArticleId);
+            builder.Entity<Comment>()
+          .HasOne(f => f.User)
+          .WithMany(f => f.Comments)
+          .HasForeignKey(f => f.User_id);
+
+            builder.Entity<Comment>()
+           .HasOne(f => f.Article)
+           .WithMany(f => f.Comments)
+           .HasForeignKey(f => f.ArticleId);
 
             builder.Entity<ArticleTag>()
                 .HasOne(f => f.Article)
@@ -63,8 +72,7 @@ namespace RealWord.DB
             builder.Entity<Folower>().HasKey(l => new { l.UserId ,l.followerId });
 
 
-            builder.Entity<Comment>().HasKey(l => new { l.ArticleId ,l.User_id });
-            builder.Entity<Like>().HasKey(l => new { l.ArticleId ,l.User_id });
+
 
             //shadow property
             builder.Entity<Article>()
