@@ -1,4 +1,8 @@
-﻿namespace RealWordBE.Authentication.Logout
+﻿using RealWord.DB.Entities;
+using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
+
+namespace RealWordBE.Authentication.Logout
 {
     public interface ITokenManager
     {
@@ -7,5 +11,8 @@
         bool IsActiveAsync(string token);
         bool IsCurrentActiveToken();
         public string GetCurrentTokenAsync();
+        Task<string> CreateJwtToken(User user);
+        bool ValidateToken(string authToken);
+        JwtSecurityToken ExtractClaims(string token);
     }
 }

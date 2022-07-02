@@ -7,7 +7,7 @@ namespace RealWord.DB.Entities
 {
     public class Like
     {
-
+        [Key]
         public int LikeId { get; set; }
         public int ArticleId { get; set; }
         public string User_id { get; set; }

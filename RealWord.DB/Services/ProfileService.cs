@@ -44,26 +44,26 @@ namespace RealWord.DB.Services
             return profile;
         }
 
-        public async Task<FollowResult> FollowUser(string SrcUserName ,string DestinationUserName)
+        public async Task<Status> FollowUser(string SrcUserName ,string DestinationUserName)
         {
             var dstUser = await _userReposotory.GetUserByUsernameAsync(DestinationUserName);
-            if( dstUser == null ) { return FollowResult.Invalid; }
+            if( dstUser == null ) { return Status.Invalid; }
 
             var SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
 
             if( _followerRepository.IsFollowing(SrcUser.Id ,dstUser.Id) )
             {
-                return FollowResult.Duplicate;
+                return Status.Duplicate;
             }
             await _followerRepository.CreateFollow(SrcUser.Id ,dstUser.Id);
             await _followerRepository.SaveChangesAsync();
-            return FollowResult.Completed;
+            return Status.Completed;
 
         }
-        public async Task<FollowResult> UnFollowUser(string SrcUserName ,string DestinationUserName)
+        public async Task<Status> UnFollowUser(string SrcUserName ,string DestinationUserName)
         {
             var dstUser = await _userReposotory.GetUserByUsernameAsync(DestinationUserName);
-            if( dstUser == null ) { return FollowResult.Invalid; }
+            if( dstUser == null ) { return Status.Invalid; }
 
             var SrcUser = await _userReposotory.GetUserByUsernameAsync(SrcUserName);
 
@@ -72,11 +72,11 @@ namespace RealWord.DB.Services
             {
                 if( !_followerRepository.IsFollowing(SrcUser.Id ,dstUser.Id) )
                 {
-                    return FollowResult.Duplicate;
+                    return Status.Duplicate;
                 }
             }
             await _followerRepository.SaveChangesAsync();
-            return FollowResult.Completed;
+            return Status.Completed;
 
         }
 

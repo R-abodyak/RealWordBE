@@ -1,4 +1,5 @@
-﻿using RealWord.DB.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using RealWord.DB.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,27 +13,44 @@ namespace RealWord.DB.Repositories
         public ArticleRebository(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
         {
         }
+        public IEnumerable<Article> ListArticlesWithFilters(int limit ,int offset ,int tagId ,string favoritedUserId ,string authorId)
+        {
+
+            var articles = _context.Articles.OrderByDescending(b => EF.Property<DateTime>(b ,"CreatedDate")).
+                Include(a => a.ArticleTags).
+                Include(a => a.Likes).ToList();
+            // var articles = _context.Articles.ToList();
+            if( authorId != null )
+            {
+                articles = articles.Where(a => a.UserId == authorId).ToList();
+            }
+
+            if( tagId > 0 )
+            {
+
+                articles = articles.Where
+                (a => a.ArticleTags.Where(a => a.TagId == tagId).Count() > 0).ToList();
+
+            }
+            if( favoritedUserId != null )
+            {
+                articles = articles.Where
+                    (a => a.Likes.Where(a => a.User_id == favoritedUserId).Count() > 0).ToList();
+            }
+
+            return articles.Skip(offset).Take(limit);
+            //
+        }
 
         public async Task AddArticle(Article article)
         {
+
             var result = await _context.Articles.AddAsync(article);
 
 
         }
 
 
-        public async Task AddTagsToArticle(string slug ,List<Tag> tagList)
-        {
-            var article = GetArticleBySlug(slug);
-            var JoinList = new List<ArticleTag>();
-            foreach( var tag in tagList )
-            {
-                var tagg = _context.Tags.Where(t => t.Name == tag.Name).FirstOrDefault();
-                JoinList.Add(new ArticleTag() { Article = article ,Tag = tagg });
-            };
-            //}
-            await _context.AddRangeAsync(JoinList);
-        }
 
         public Article GetArticleBySlug(string slug)
         {

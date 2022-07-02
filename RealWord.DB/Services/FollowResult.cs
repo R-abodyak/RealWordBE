@@ -1,7 +1,10 @@
-﻿public enum FollowResult
+﻿namespace RealWord.DB.Services
 {
-    Invalid,
-    Duplicate,
-    Completed
+    public enum Status
+    {
+        Invalid,
+        Duplicate,
+        Completed
 
+    }
 }
