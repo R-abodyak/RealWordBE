@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RealWord.DB;
 using RealWord.DB.Entities;
+using RealWord.DB.Extension;
 using RealWord.DB.Models.RequestDtos;
 using RealWord.DB.Models.ResponseDtos;
 using RealWord.DB.Repositories;
@@ -60,6 +61,7 @@ namespace RealWord.DB.Services
         public async Task<IEnumerable<CommentResponseDto>> GetComments(string slug ,string CurrentUserName)
         {
             var comments = _commentRebository.GetComments(slug);
+            if( comments == null ) return null;
             IList<CommentResponseDto> responses = new List<CommentResponseDto>();
             foreach( var comment in comments )
             {
@@ -73,8 +75,10 @@ namespace RealWord.DB.Services
         private async Task<CommentResponseDto> GenerateCommentRespnseDto(int id ,string slug ,string CurrentUserName ,Comment comment)
         {
             var commentResponse = _mapper.Map<CommentResponseDto>(comment);
-            commentResponse.UpdatedDate = await _commentRebository.GetUpdatedDateAsync(id);
-            commentResponse.CreatedDate = await _commentRebository.GetCreatedDate(id);
+            DateTime updateDataTime = await _commentRebository.GetUpdatedDateAsync(id);
+            DateTime createDataTime = await _commentRebository.GetCreatedDate(id);
+            commentResponse.UpdatedDate = updateDataTime.ToUniversalIso8601();
+            commentResponse.CreatedDate = createDataTime.ToUniversalIso8601();
             var author = _articleRepository.GetAuthorofArticle(slug);
 
             commentResponse.Author =
@@ -82,6 +86,29 @@ namespace RealWord.DB.Services
             return commentResponse;
         }
 
+        public async Task RemoveComment(int id)
+        {
+            var comment = await _commentRebository.GetComment(id);
+            if( comment == null ) return;
+            _commentRebository.RemoveComment(comment);
+            await SaveChangesAsync();
+
+        }
+
+        public async Task<bool> DoesUserMatchAuthorAsync(int commentId ,string userId)
+        {
+            var comment = await _commentRebository.GetComment(commentId);
+            if( comment == null ) return false;
+            if( userId == comment.User_id ) return true;
+
+            return false;
+        }
+
+        public async Task<Comment> GetCommentAsync(int id)
+        {
+            return await _commentRebository.GetComment(id);
+
+        }
 
     }
 }
