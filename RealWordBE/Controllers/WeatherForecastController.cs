@@ -16,11 +16,9 @@ namespace RealWordBE.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController()
         {
-            _logger = logger;
         }
 
         [HttpGet]
@@ -34,6 +32,11 @@ namespace RealWordBE.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+        [HttpPost]
+        public IEnumerable<WeatherForecast> post()
+        {
+            return Get();
         }
     }
 }

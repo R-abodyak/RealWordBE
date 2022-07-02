@@ -150,7 +150,144 @@ namespace RealWord.DB.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("RealWord.DB.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("RealWord.DB.Entities.Article", b =>
+                {
+                    b.Property<int>("ArticleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ArticleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Articles");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.ArticleTag", b =>
+                {
+                    b.Property<int>("ArticleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ArticleId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ArticleTag");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Comment", b =>
+                {
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ArticleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CommentMsg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User_id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("User_id");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Folower", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("followerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "followerId");
+
+                    b.HasIndex("followerId");
+
+                    b.ToTable("Folower");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Like", b =>
+                {
+                    b.Property<int>("LikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ArticleId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User_id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LikeId");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("User_id");
+
+                    b.ToTable("Likes");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Tag", b =>
+                {
+                    b.Property<int>("TagId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TagId");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -188,9 +325,6 @@ namespace RealWord.DB.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -235,7 +369,7 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("RealWord.DB.Entities.ApplicationUser", null)
+                    b.HasOne("RealWord.DB.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -244,7 +378,7 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("RealWord.DB.Entities.ApplicationUser", null)
+                    b.HasOne("RealWord.DB.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -259,7 +393,7 @@ namespace RealWord.DB.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealWord.DB.Entities.ApplicationUser", null)
+                    b.HasOne("RealWord.DB.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -268,11 +402,74 @@ namespace RealWord.DB.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("RealWord.DB.Entities.ApplicationUser", null)
+                    b.HasOne("RealWord.DB.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Article", b =>
+                {
+                    b.HasOne("RealWord.DB.Entities.User", "User")
+                        .WithMany("Articles")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.ArticleTag", b =>
+                {
+                    b.HasOne("RealWord.DB.Entities.Article", "Article")
+                        .WithMany("ArticleTags")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealWord.DB.Entities.Tag", "Tag")
+                        .WithMany("ArticleTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Comment", b =>
+                {
+                    b.HasOne("RealWord.DB.Entities.Article", "Article")
+                        .WithMany("Comments")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealWord.DB.Entities.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("User_id");
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Folower", b =>
+                {
+                    b.HasOne("RealWord.DB.Entities.User", "User")
+                        .WithMany("followers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealWord.DB.Entities.User", "follower")
+                        .WithMany()
+                        .HasForeignKey("followerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RealWord.DB.Entities.Like", b =>
+                {
+                    b.HasOne("RealWord.DB.Entities.Article", "Article")
+                        .WithMany("Likes")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealWord.DB.Entities.User", "User")
+                        .WithMany("Likes")
+                        .HasForeignKey("User_id");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RealWord.DB.Entities;
@@ -15,14 +14,13 @@ using System.Threading.Tasks;
 
 namespace RealWordBE.Authentication
 {
-    public class UserService:IUserService
+    public class UserRepository:IUserRepository
     {
         private readonly UserManager<User> _userManager;
-        private readonly JWT _jwt;
-        public UserService(UserManager<User> userManager ,IOptions<JWT> jwt)
+        public UserRepository(UserManager<User> userManager ,IOptions<JWT> jwt)
         {
             _userManager = userManager;
-            _jwt = jwt.Value;
+
         }
 
         public async Task<User> AuthenticateUser(string email ,string password)
@@ -46,36 +44,14 @@ namespace RealWordBE.Authentication
 
         }
 
-        public async Task<string> CreateJwtToken(User user)
-        {
-            var userClaims = await _userManager.GetClaimsAsync(user);
 
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim("emailaddress", user.Email),
-                new Claim("uid", user.Id)
-            }
-            .Union(userClaims);
-
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey ,SecurityAlgorithms.HmacSha256);
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: _jwt.Issuer ,
-                audience: _jwt.Audience ,
-                claims: claims ,
-                expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes) ,
-                signingCredentials: signingCredentials);
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
-        }
-        public async Task<string> RegisterAsync(User user)
+        public async Task<string> RegisterAsync(User user ,string password)
         {
             var X = user;
             var userWithSameEmail = await _userManager.FindByEmailAsync(user.Email);
             if( userWithSameEmail == null )
             {
-                var result = await _userManager.CreateAsync(user ,user.Password);
+                var result = await _userManager.CreateAsync(user ,password);
                 if( result.Succeeded )
                 {
 
@@ -89,10 +65,21 @@ namespace RealWordBE.Authentication
             }
         }
 
-        async Task<User> IUserService.GetUserByEmailAsync(string email)
+        async Task<User> IUserRepository.GetUserByEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             return user;
+        }
+        async Task<User> IUserRepository.GetUserByUsernameAsync(string userName)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            return user;
+        }
+
+        async Task IUserRepository.UpdateUser(User currentUser)
+        {
+
+            var result = await _userManager.UpdateAsync(currentUser);
         }
     }
 }

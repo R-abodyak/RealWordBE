@@ -9,6 +9,7 @@ namespace RealWord.DB.Models.Request_Dtos
     public class LoginDto
     {
         [Required]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
         [JsonPropertyName("email")]
         public string Email { get; set; }
         [Required]
